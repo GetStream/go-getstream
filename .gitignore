@@ -1,2 +1,9 @@
 coverage.out
 coverage.html
+
+examples/
+
+# IDEs
+.idea
+stream-go.iml
+test.sh

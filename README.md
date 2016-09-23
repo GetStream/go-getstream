@@ -1,117 +1,215 @@
-# GO-GETSTREAM
+# stream-go
 
-[![wercker status](https://app.wercker.com/status/adc2bf440cb3e5b8f4fa3abf9244624d/s/master "wercker status")](https://app.wercker.com/project/byKey/adc2bf440cb3e5b8f4fa3abf9244624d)
-[![godoc](https://godoc.org/github.com/mrhenry/go-getstream?status.svg)](https://godoc.org/github.com/mrhenry/go-getstream)
-[![codecov](https://codecov.io/gh/mrhenry/go-getstream/branch/master/graph/badge.svg)](https://codecov.io/gh/mrhenry/go-getstream)
+[![godoc](https://godoc.org/github.com/GetStream/stream-go?status.svg)](https://godoc.org/github.com/stream-go)
+[![codecov](https://codecov.io/gh/GetStream/stream-go/branch/master/graph/badge.svg)](https://codecov.io/gh/GetStream/stream-go)
 
-Golang pkg for [getstream.io](getstream.io). The goal of this package is to provide server-side support for getstream and to generate client-side tokens.
+Beta client library for [GetStream.io](//getstream.io).
 
-### Examples :
+This library could not exist without the efforts of several open-source community members, 
+including the awesome folks at [MrHenry](//github.com/mrhenry) and 
+[HyperWorks](//github.com/hyperworks)(HyperWorks). Thank you so much for contributing
+to our community!
 
-Server Side
+The code provided by the MrHenry team is used with written permission; we are working 
+with them to get a final license in place. Stream will be modifying the codebase 
+together with MrHenry over time, so we especially want to point out how great they 
+have been working with us to release this library.
 
+### Beta
+
+We are releasing this as our v0.9.0 beta since there may be bugs, and inevitable cleanup 
+will happen along the way. Please do not hesitate to [contact us](mailto:support@getstream.io)
+if you see something strange happening. We'd be happy to consider any and all pull 
+requests from the community as well!
+
+### Example Usage
+
+Creating a client:
 ```go
-client, err := getstream.New("APIKey", "APISecret", "AppID", "Region")
-if err != nil {
-  fmt.Println(err)
-  return
-}
+import (
+	"fmt"
+	"github.com/GetStream/stream-go"
+)
 
-feed, err := client.FlatFeed("FeedSlug", "UserID")
-if err != nil {
-  fmt.Println(err)
-  return
-}
+// we recommend getting your API credentials using os.Getenv()
+APIKey string = "your-api-key"
+APISecret string = "your-api-secret"
 
-activity, err := feed.AddActivity(&Activity{
-  Verb:      "post",
-  ForeignID: "48d024fe-3752-467a-8489-23febd1dec4e",
-  Object:    FeedID("flat:eric"),
-  Actor:     FeedID("flat:john"),
+// your application ID, found on your GetStream.io dashboard
+AppID string = "16013"
+
+// Location is optional; leaving it blank will default the
+// hostname to "api.getstream.io"
+// but we do have geographic-specific choices:
+// "us-east", "us-west" and "eu-west"
+Location string = "us-east"
+
+// TimeoutInt is an optional integer parameter to define
+// the number of seconds before your connection will hang-up
+// during a request; you can set this to any non-negative
+// and non-zero whole number, and will default to 3 
+TimeoutInt: 3
+
+client, err := getstream.New(&getstream.Config{
+    APIKey:    os.Getenv("STREAM_APIKEY"),
+    APISecret: os.Getenv("STREAM_APISECRET"),
+    AppID:     os.Getenv("STREAM_APPID"),
+    Location:  os.Getenv("STREAM_LOCATION"),
 })
 if err != nil {
-  fmt.Println(err)
+    return err
 }
 ```
 
-Client Side Token
+Creating a Feed object for a user:
 
 ```go
+// this code assumes you've created a flat feed named "flat-feed-name" for your app
+// we also recommend using UUID values for users
 
-client, err := getstream.New("APIKey", "APISecret", "AppID", "Region")
+bobFeed, err := client.FlatFeed("flat-feed-name", "bob-uuid")
 if err != nil {
-  fmt.Println(err)
-  return
-}
-
-feed, err := client.FlatFeed("FeedSlug", "UserID")
-if err != nil {
-  fmt.Println(err)
-  return
-}
-
-token, err := client.Signer.GenerateFeedScopeToken(getstream.ScopeContextFeed, getstream.ScopeActionRead, feed)
-if err != nil {
-  fmt.Println(err)
-}
-
-clientSideClient, err := getstream.NewWithToken("APIKey", token, "AppID", "Region")
-if err != nil {
-  fmt.Println(err)
+    return err
 }
 ```
 
-### Supported :
-- Flat Feed
-  - Add
-  - Add Multiple
-  - Remove
-  - Remove By ForeignID
-  - List
-  - Follow
-  - UnFollow
-  - Followers
-  - Following
+Creating an activity on Bob's flat feed:
+```go
+import "github.com/pborman/uuid"
 
-- Aggregated Feed
-  - Add
-  - Add Multiple
-  - Remove
-  - Remove By ForeignID
-  - List
-  - Follow
-  - UnFollow
-  - Following
+activity, err := bobFeed.AddActivity(&Activity{
+    Verb:      "post",
+    ForeignID: uuid.New(),
+    Object:    FeedID("flat:eric"),
+    Actor:     FeedID("flat:john"),
+})
+if err != nil {
+    return err
+}
+```
 
-- Notification Feed
-  - Add
-  - Add Multiple
-  - Remove
-  - Remove By ForeignID
-  - List
-  - Follow
-  - UnFollow
-  - Following
-  - Mark Read
-  - Mark Seen
+The library is gradually introducing JWT support. You can generate a client token
+for a feed using the following example:
 
-- Client Side Tokens :
-  - fully implemented
+```go
+client, err := getstream.New(&getstream.Config{
+    APIKey:    os.Getenv("STREAM_APIKEY"),
+    APISecret: os.Getenv("STREAM_APISECRET"),
+    AppID:     os.Getenv("STREAM_APPID"),
+    Location:  os.Getenv("STREAM_LOCATION"),
+})
 
-### Structure :
-- Follows getstream API standards for all request payloads
+feed, err := client.FlatFeed("flat-feed-name", "bob-uuid")
+if err != nil {
+    return err
+}
+
+token, err := client.Signer.GenerateFeedScopeToken(
+    getstream.ScopeContextFeed, 
+    getstream.ScopeActionRead, 
+    bobFeed)
+if err != nil {
+    fmt.Println(err)
+}
+
+// note in the struct below that we're not setting APISecret
+// but setting "Token" instead:
+clientSideClient, err := getstream.NewWithToken(&getstream.Config{
+    APIKey:    os.Getenv("STREAM_APIKEY"),
+    Token:     token, // not setting APISecret
+    AppID:     os.Getenv("STREAM_APPID"),
+    Location:  os.Getenv("STREAM_LOCATION"),
+})
+if err != nil {
+  return err
+}
+```
+
+JWT support is not yet fully tested on the library, but we'd love to 
+hear any feedback you have if you try it out.
+
+### API Support
+
+Flat Feed
+
+- [x] Add one or more Activities (AddActivity, AddActivities)
+- [x] Remove Activity (RemoveActivity, RemoveActivityByForeignID)
+- [x] Get a list of Activities on the Feed (Activities)
+- [x] Follow another Feed (FollowFeedWithCopyLimit)
+- [x] UnFollow another Feed (Unfollow, UnfollowAggregated, UnfollowNotification, UnfollowKeepingHistory)
+- [x] Get Followers of this Feed (FollowersWithLimitAndSkip)
+- [x] Get list of Feeds this Feed is Following (FollowingWithLimitAndSkip)
+- [x] Follow Many Feeds (FollowManyFeeds)
+- [x] Update one or more Activities (UpdateActivity, UpdateActivities)
+
+Aggregated Feed
+
+- [x] Add one or more Activities (AddActivity, AddActivities)
+- [x] Remove Activity (RemoveActivity, RemoveActivityByForeignID)
+- [x] Get a list of Activities on the Feed (Activities)
+- [x] Follow another Feed (FollowFeedWithCopyLimit)
+- [x] UnFollow another Feed (Unfollow, UnfollowKeepingHistory)
+- [x] Get Followers of this Feed (FollowersWithLimitAndSkip)
+- [x] Get list of Feeds this Feed is Following (FollowingWithLimitAndSkip)
+- [ ] Update one or more Activities
+
+Notification Feed
+
+- [x] Add one or more Activities (AddActivity, AddActivities)
+- [x] Remove Activity (RemoveActivity, RemoveActivityByForeignID)
+- [x] Get a list of Activities on the Feed (Activities)
+- [x] Follow another Feed (FollowFeedWithCopyLimit)
+- [x] UnFollow another Feed (Unfollow, UnfollowKeepingHistory)
+- [x] Get list of Feeds this Feed is Following (FollowingWithLimitAndSkip)
+- [x] Mark Read (MarkActivitiesAsRead)
+- [x] Mark Seen (MarkActivitiesAsSeenWithLimit)
+- [x] Get Followers of this Feed (FollowersWithLimitAndSkip)
+- [ ] Update one or more Activities
+
+### Activity Payload Structure
+
+Payload building Follows our API standards for all request payloads
 - `data` : Statically typed payloads as `json.RawMessage`
 - `metadata` : Top-level key/value pairs
 
-You can/should use `data` to send golang structures through getstream. This will give you the benefit of golang's static type system.
-If you can't know the contents of an Activity you can use metadata which is a `map[string]string`, encoding to json will move these values to the top-level. This means that keys which conflict with standard getstream keys will be overwritten. The benefit of this structure is that these key/value pairs will be exposed to getstream internals such as ranking,...
+You can/should use `data` to send Go structures through the library. This 
+will give you the benefit of Go's static type system. If you are unable
+to determine a type (or compatible type) for the contents of an Activity,
+you can use `metadata` which is a `map[string]string`; encoding this to
+JSON will move these values to the top-level, so any keys you define in
+your `metadata` which conflict with our standard top-level keys will be
+overwritten.
 
-### Design Choices :
+The benefit of this `metadata` structure is that these key/value pairs 
+will be exposed to Stream's internals such as ranking.
 
-- Flat / Aggregated / Notification Feeds have separate structures and methods to prevent the impact of future getstream changes. If two types of feeds grow farther apart this can be incorporated in this client without breaking everything.
+### Design Choices
 
-### Credits :
+Many design choices in the library were inherited from the team at MrHenry,
+with some choices to refactor some of the test code as its own getstream_test
+package. This choice meant exposing some attributes that perhaps should
+be left private, and we expect this re-refactoring will take place over
+time.
 
-This pkg started out as a fork from https://github.com/hyperworks/go-getstream and still borrows snippets (token & errors) from the original. I decided to make this a separate repo entirely because drastic changes were made to the interface and internal workings.
+The MrHenry team noted this about the Flat / Aggregated / Notification 
+Feed types:
+- they have separate structures and methods to prevent the impact of 
+future Stream changes
+- if two types of feeds grow farther apart, incorporated future changes
+in this client should not breaking everything
 
-We received great support from getstream while creating this pkg for which we are very grateful and we also want to thank them for creating getstream in the first place.
+### Credits
+
+Have we mentioned the team at [MrHenry](//github.com/mrhenry) yet??
+
+##### Credits from MrHenry that we wanted to pass along as well:
+
+This pkg started out as a fork from [HyperWorks](//github.com/hyperworks/go-getstream)
+and still borrows snippets (token & errors) from the original. We 
+decided to make this a separate repo entirely because drastic changes 
+were made to the interface and internal workings.
+
+We received great support from Stream while creating this pkg for which
+we are very grateful, and we also want to thank them for creating 
+Stream in the first place.
+

@@ -7,26 +7,144 @@ import (
 	"strings"
 )
 
+type postAggregatedFeedOutputActivities struct {
+	Activities []*Activity `json:"activities"`
+}
+
+// GetAggregatedFeedInput is used to Get a list of Activities from a AggregatedFeed
+type GetAggregatedFeedInput struct {
+	Limit  int `json:"limit,omitempty"`
+	Offset int `json:"offset,omitempty"`
+
+	IDGTE string `json:"id_gte,omitempty"`
+	IDGT  string `json:"id_gt,omitempty"`
+	IDLTE string `json:"id_lte,omitempty"`
+	IDLT  string `json:"id_lt,omitempty"`
+
+	Ranking string `json:"ranking,omitempty"`
+}
+
+// GetAggregatedFeedOutput is the response from a AggregatedFeed Activities Get Request
+type GetAggregatedFeedOutput struct {
+	Duration string
+	Next     string
+	Results  []*struct {
+		Activities    []*Activity
+		ActivityCount int
+		ActorCount    int
+		CreatedAt     string
+		Group         string
+		ID            string
+		UpdatedAt     string
+		Verb          string
+	}
+}
+
+type getAggregatedFeedOutput struct {
+	Duration string                           `json:"duration"`
+	Next     string                           `json:"next"`
+	Results  []*getAggregatedFeedOutputResult `json:"results"`
+}
+
+func (a getAggregatedFeedOutput) output() *GetAggregatedFeedOutput {
+
+	output := GetAggregatedFeedOutput{
+		Duration: a.Duration,
+		Next:     a.Next,
+	}
+
+	var results []*struct {
+		Activities    []*Activity
+		ActivityCount int
+		ActorCount    int
+		CreatedAt     string
+		Group         string
+		ID            string
+		UpdatedAt     string
+		Verb          string
+	}
+
+	for _, result := range a.Results {
+
+		outputResult := struct {
+			Activities    []*Activity
+			ActivityCount int
+			ActorCount    int
+			CreatedAt     string
+			Group         string
+			ID            string
+			UpdatedAt     string
+			Verb          string
+		}{
+			ActivityCount: result.ActivityCount,
+			ActorCount:    result.ActorCount,
+			CreatedAt:     result.CreatedAt,
+			Group:         result.Group,
+			ID:            result.ID,
+			UpdatedAt:     result.UpdatedAt,
+			Verb:          result.Verb,
+		}
+
+		for _, activity := range result.Activities {
+			outputResult.Activities = append(outputResult.Activities, activity)
+		}
+
+		results = append(results, &outputResult)
+	}
+
+	output.Results = results
+
+	return &output
+}
+
+type getAggregatedFeedOutputResult struct {
+	Activities    []*Activity `json:"activities"`
+	ActivityCount int         `json:"activity_count"`
+	ActorCount    int         `json:"actor_count"`
+	CreatedAt     string      `json:"created_at"`
+	Group         string      `json:"group"`
+	ID            string      `json:"id"`
+	UpdatedAt     string      `json:"updated_at"`
+	Verb          string      `json:"verb"`
+}
+
+type getAggregatedFeedFollowersInput struct {
+	Limit int `json:"limit"`
+	Skip  int `json:"offset"`
+}
+
+type getAggregatedFeedFollowersOutput struct {
+	Duration string                                    `json:"duration"`
+	Results  []*getAggregatedFeedFollowersOutputResult `json:"results"`
+}
+
+type getAggregatedFeedFollowersOutputResult struct {
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	FeedID    string `json:"feed_id"`
+	TargetID  string `json:"target_id"`
+}
+
+type postAggregatedFeedFollowingInput struct {
+	Target            string `json:"target"`
+	ActivityCopyLimit int    `json:"activity_copy_limit"`
+}
+
 // AggregatedFeed is a getstream AggregatedFeed
 // Use it to for CRUD on AggregatedFeed Groups
 type AggregatedFeed struct {
-	client   *Client
+	Client   *Client
 	FeedSlug string
 	UserID   string
 	token    string
 }
 
-// Client returns the Client associated with the AggregatedFeed
-func (f AggregatedFeed) Client() *Client {
-	return f.client
-}
-
 // Signature is used to sign Requests : "FeedSlugUserID Token"
 func (f *AggregatedFeed) Signature() string {
 	if f.Token() == "" {
-		return f.feedIDWithoutColon()
+		return f.FeedIDWithoutColon()
 	}
-	return f.feedIDWithoutColon() + " " + f.Token()
+	return f.FeedIDWithoutColon() + " " + f.Token()
 }
 
 // FeedID is the combo if the FeedSlug and UserID : "FeedSlug:UserID"
@@ -34,14 +152,14 @@ func (f *AggregatedFeed) FeedID() FeedID {
 	return FeedID(f.FeedSlug + ":" + f.UserID)
 }
 
-func (f *AggregatedFeed) feedIDWithoutColon() string {
+func (f *AggregatedFeed) FeedIDWithoutColon() string {
 	return f.FeedSlug + f.UserID
 }
 
 // SignFeed sets the token on a Feed
 func (f *AggregatedFeed) SignFeed(signer *Signer) {
-	if f.Client().Signer != nil {
-		f.token = signer.generateToken(f.feedIDWithoutColon())
+	if f.Client.Signer != nil {
+		f.token = signer.GenerateToken(f.FeedIDWithoutColon())
 	}
 }
 
@@ -52,8 +170,8 @@ func (f *AggregatedFeed) Token() string {
 
 // GenerateToken returns a new Token for a Feed without setting it to the Feed
 func (f *AggregatedFeed) GenerateToken(signer *Signer) string {
-	if f.Client().Signer != nil {
-		return signer.generateToken(f.FeedSlug + f.UserID)
+	if f.Client.Signer != nil {
+		return signer.GenerateToken(f.FeedSlug + f.UserID)
 	}
 	return ""
 }
@@ -68,7 +186,7 @@ func (f *AggregatedFeed) AddActivity(activity *Activity) (*Activity, error) {
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/"
 
-	resultBytes, err := f.Client().post(f, endpoint, payload, nil)
+	resultBytes, err := f.Client.post(f, endpoint, payload, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +212,7 @@ func (f *AggregatedFeed) AddActivities(activities []*Activity) ([]*Activity, err
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/"
 
-	resultBytes, err := f.Client().post(f, endpoint, payload, nil)
+	resultBytes, err := f.Client.post(f, endpoint, payload, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +241,7 @@ func (f *AggregatedFeed) Activities(input *GetAggregatedFeedInput) (*GetAggregat
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/"
 
-	result, err := f.Client().get(f, endpoint, payload, nil)
+	result, err := f.Client.get(f, endpoint, payload, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +260,7 @@ func (f *AggregatedFeed) RemoveActivity(input *Activity) error {
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + input.ID + "/"
 
-	return f.Client().del(f, endpoint, nil, nil)
+	return f.Client.del(f, endpoint, nil, nil)
 }
 
 // RemoveActivityByForeignID removes an Activity from a NotificationFeedGroup by ForeignID
@@ -162,7 +280,7 @@ func (f *AggregatedFeed) RemoveActivityByForeignID(input *Activity) error {
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + input.ForeignID + "/"
 
-	return f.Client().del(f, endpoint, nil, map[string]string{
+	return f.Client.del(f, endpoint, nil, map[string]string{
 		"foreign_id": "1",
 	})
 }
@@ -182,7 +300,7 @@ func (f *AggregatedFeed) FollowFeedWithCopyLimit(target *FlatFeed, copyLimit int
 		return err
 	}
 
-	_, err = f.Client().post(f, endpoint, payload, nil)
+	_, err = f.Client.post(f, endpoint, payload, nil)
 	return err
 
 }
@@ -192,7 +310,7 @@ func (f *AggregatedFeed) Unfollow(target *FlatFeed) error {
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/" + target.FeedID().Value() + "/"
 
-	return f.Client().del(f, endpoint, nil, nil)
+	return f.Client.del(f, endpoint, nil, nil)
 
 }
 
@@ -209,8 +327,54 @@ func (f *AggregatedFeed) UnfollowKeepingHistory(target *FlatFeed) error {
 		return err
 	}
 
-	return f.Client().del(f, endpoint, payload, nil)
+	return f.Client.del(f, endpoint, payload, nil)
 
+}
+
+// FollowersWithLimitAndSkip returns a list of GeneralFeed following the current AggregatedFeed
+func (f *AggregatedFeed) FollowersWithLimitAndSkip(limit int, skip int) ([]*GeneralFeed, error) {
+	var err error
+
+	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "followers" + "/"
+
+	payload, err := json.Marshal(&getFlatFeedFollowersInput{
+		Limit: limit,
+		Skip:  skip,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	resultBytes, err := f.Client.get(f, endpoint, payload, nil)
+
+	output := &getAggregatedFeedFollowersOutput{}
+	err = json.Unmarshal(resultBytes, output)
+	if err != nil {
+		return nil, err
+	}
+
+	var outputFeeds []*GeneralFeed
+	for _, result := range output.Results {
+
+		feed := GeneralFeed{}
+
+		var match bool
+		match, err = regexp.MatchString(`^.*?:.*?$`, result.FeedID)
+		if err != nil {
+			continue
+		}
+
+		if match {
+			firstSplit := strings.Split(result.FeedID, ":")
+
+			feed.FeedSlug = firstSplit[0]
+			feed.UserID = firstSplit[1]
+		}
+
+		outputFeeds = append(outputFeeds, &feed)
+	}
+
+	return outputFeeds, err
 }
 
 // FollowingWithLimitAndSkip returns a list of GeneralFeed followed by the current FlatFeed
@@ -228,7 +392,7 @@ func (f *AggregatedFeed) FollowingWithLimitAndSkip(limit int, skip int) ([]*Gene
 		return nil, err
 	}
 
-	resultBytes, err := f.Client().get(f, endpoint, payload, nil)
+	resultBytes, err := f.Client.get(f, endpoint, payload, nil)
 
 	output := &getAggregatedFeedFollowersOutput{}
 	err = json.Unmarshal(resultBytes, output)

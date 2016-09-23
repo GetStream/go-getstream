@@ -1,320 +1,260 @@
-package getstream
+package getstream_test
 
 import (
-	"fmt"
+	"encoding/json"
 	"testing"
 	"time"
+
+	getstream "github.com/GetStream/stream-go"
+	"github.com/pborman/uuid"
 )
 
-func ExampleNotificationFeed_AddActivity() {
-
-	client, err := New("APIKey", "APISecret", "AppID", "Region")
+func TestExampleNotificationFeed_AddActivity(t *testing.T) {
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
 
-	feed, err := client.NotificationFeed("FeedSlug", "UserID")
+	feed, err := client.NotificationFeed("flat", "UserID")
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
 
-	activity, err := feed.AddActivity(&Activity{
+	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: "48d024fe-3752-467a-8489-23febd1dec4e",
-		Object:    FeedID("flat:eric"),
-		Actor:     FeedID("flat:john"),
+		ForeignID: uuid.New(),
+		Object:    getstream.FeedID("flat:eric"),
+		Actor:     getstream.FeedID("flat:john"),
 	})
 	if err != nil {
-		fmt.Println(err)
-		return
+		t.Fatal(err)
 	}
 
 	_ = activity
 }
 
 func TestNotificationFeedAddActivity(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feed, err := client.NotificationFeed("notification", "bob")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	activity, err := feed.AddActivity(&Activity{
+	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: "48d024fe-3752-467a-8489-23febd1dec4e",
-		Object:    FeedID("flat:eric"),
-		Actor:     FeedID("flat:john"),
+		ForeignID: uuid.New(),
+		Object:    getstream.FeedID("flat:eric"),
+		Actor:     getstream.FeedID("flat:john"),
 	})
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 
 	if activity.Verb != "post" && activity.ForeignID != "48d024fe-3752-467a-8489-23febd1dec4e" {
 		t.Fail()
 	}
 
-	err = testCleanUp(client, nil, []*Activity{activity}, nil)
+	err = PostTestCleanUp(client, nil, []*getstream.Activity{activity}, nil)
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 }
 
 func TestNotificationFeedAddActivityWithTo(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feed, err := client.NotificationFeed("notification", "bob")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feedTo, err := client.NotificationFeed("notification", "barry")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	activity, err := feed.AddActivity(&Activity{
+	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: "48d024fe-3752-467a-8489-23febd1dec4e",
-		Object:    FeedID("flat:eric"),
-		Actor:     FeedID("flat:john"),
-		To:        []Feed{feedTo},
+		ForeignID: uuid.New(),
+		Object:    getstream.FeedID("flat:eric"),
+		Actor:     getstream.FeedID("flat:john"),
+		To:        []getstream.Feed{feedTo},
 	})
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 
 	if activity.Verb != "post" && activity.ForeignID != "48d024fe-3752-467a-8489-23febd1dec4e" {
 		t.Fail()
 	}
 
-	err = testCleanUp(client, nil, []*Activity{activity}, nil)
+	err = PostTestCleanUp(client, nil, []*getstream.Activity{activity}, nil)
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 }
 
 func TestNotificationFeedRemoveActivity(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feed, err := client.NotificationFeed("notification", "bob")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	activity, err := feed.AddActivity(&Activity{
+	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:   "post",
-		Object: FeedID("flat:eric"),
-		Actor:  FeedID("flat:john"),
+		Object: getstream.FeedID("flat:eric"),
+		Actor:  getstream.FeedID("flat:john"),
 	})
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 
 	if activity.Verb != "post" {
 		t.Fail()
 	}
 
-	rmActivity := Activity{
+	rmActivity := getstream.Activity{
 		ID: activity.ID,
 	}
 
 	err = feed.RemoveActivity(&rmActivity)
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 }
 
 func TestNotificationFeedRemoveByForeignIDActivity(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feed, err := client.NotificationFeed("notification", "bob")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	activity, err := feed.AddActivity(&Activity{
+	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: "08f01c47-014f-11e4-aa8f-0cc47a024be0",
-		Object:    FeedID("flat:eric"),
-		Actor:     FeedID("flat:john"),
+		ForeignID: uuid.New(),
+		Object:    getstream.FeedID("flat:eric"),
+		Actor:     getstream.FeedID("flat:john"),
 	})
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 
 	if activity.Verb != "post" && activity.ForeignID != "08f01c47-014f-11e4-aa8f-0cc47a024be0" {
 		t.Fail()
 	}
 
-	rmActivity := Activity{
+	rmActivity := getstream.Activity{
 		ForeignID: activity.ForeignID,
 	}
 	_ = rmActivity
 
 	err = feed.RemoveActivityByForeignID(activity)
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	testCleanUp(client, nil, []*Activity{activity}, nil)
-
+	PostTestCleanUp(client, nil, []*getstream.Activity{activity}, nil)
 }
 
 func TestNotificationFeedActivities(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feed, err := client.NotificationFeed("notification", "bob")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	_, err = feed.AddActivity(&Activity{
+	_, err = feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: "48d024fe-3752-467a-8489-23febd1dec4e",
-		Object:    FeedID("flat:eric"),
-		Actor:     FeedID("flat:john"),
+		ForeignID: uuid.New(),
+		Object:    getstream.FeedID("flat:eric"),
+		Actor:     getstream.FeedID("flat:john"),
 	})
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 
-	activities, err := feed.Activities(&GetNotificationFeedInput{})
+	activities, err := feed.Activities(&getstream.GetNotificationFeedInput{})
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 
 	for _, result := range activities.Results {
-		err = testCleanUp(client, nil, result.Activities, nil)
+		err = PostTestCleanUp(client, nil, result.Activities, nil)
 		if err != nil {
-			fmt.Println(err)
-			t.Fail()
-			return
+			t.Fatal(err)
 		}
 	}
 }
 
 func TestNotificationFeedAddActivities(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feed, err := client.NotificationFeed("notification", "bob")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	activities, err := feed.AddActivities([]*Activity{
-		&Activity{
+	activities, err := feed.AddActivities([]*getstream.Activity{
+		&getstream.Activity{
 			Verb:      "post",
-			ForeignID: "099978b6-3b72-4f5c-bc43-247ba6ae2dd9",
-			Object:    FeedID("flat:eric"),
-			Actor:     FeedID("flat:john"),
-		}, &Activity{
+			ForeignID: uuid.New(),
+			Object:    getstream.FeedID("flat:eric"),
+			Actor:     getstream.FeedID("flat:john"),
+		}, &getstream.Activity{
 			Verb:      "walk",
-			ForeignID: "48d024fe-3752-467a-8489-23febd1dec4e",
-			Object:    FeedID("flat:john"),
-			Actor:     FeedID("flat:eric"),
+			ForeignID: uuid.New(),
+			Object:    getstream.FeedID("flat:john"),
+			Actor:     getstream.FeedID("flat:eric"),
 		},
 	})
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 
-	err = testCleanUp(client, nil, activities, nil)
+	err = PostTestCleanUp(client, nil, activities, nil)
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 }
 
 func TestNotificationFeedFollow(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feedA, err := client.NotificationFeed("notification", "bob")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feedB, err := client.FlatFeed("flat", "eric")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
@@ -327,31 +267,23 @@ func TestNotificationFeedFollow(t *testing.T) {
 		t.Fail()
 	}
 
-	testCleanUpFollows(client, []*FlatFeed{feedB})
-
+	PostTestCleanUpFlatFeedFollows(client, []*getstream.FlatFeed{feedB})
 }
 
 func TestNotificationFeedFollowKeepingHistory(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feedA, err := client.NotificationFeed("notification", "bob")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feedB, err := client.FlatFeed("flat", "eric")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
@@ -364,38 +296,28 @@ func TestNotificationFeedFollowKeepingHistory(t *testing.T) {
 		t.Fail()
 	}
 
-	testCleanUpFollows(client, []*FlatFeed{feedB})
-
+	PostTestCleanUpFlatFeedFollows(client, []*getstream.FlatFeed{feedB})
 }
 
 func TestNotificationFeedFollowingFollowers(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feedA, err := client.NotificationFeed("notification", "bob")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feedB, err := client.FlatFeed("flat", "eric")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feedC, err := client.FlatFeed("flat", "barry")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
@@ -413,30 +335,24 @@ func TestNotificationFeedFollowingFollowers(t *testing.T) {
 		t.Fail()
 	}
 
-	testCleanUpFollows(client, []*FlatFeed{feedB, feedC})
-
+	PostTestCleanUpFlatFeedFollows(client, []*getstream.FlatFeed{feedB, feedC})
 }
 
 func TestMarkAsSeen(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feed, err := client.NotificationFeed("notification", "larry")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	feed.AddActivities([]*Activity{
-		&Activity{
-			Actor:  FeedID("flat:larry"),
-			Object: FeedID("notification:larry"),
+	feed.AddActivities([]*getstream.Activity{
+		&getstream.Activity{
+			Actor:  getstream.FeedID("flat:larry"),
+			Object: getstream.FeedID("notification:larry"),
 			Verb:   "post",
 		},
 	})
@@ -458,35 +374,28 @@ func TestMarkAsSeen(t *testing.T) {
 	}
 
 	for _, result := range output.Results {
-		err = testCleanUp(client, nil, result.Activities, nil)
+		err = PostTestCleanUp(client, nil, result.Activities, nil)
 		if err != nil {
-			fmt.Println(err)
-			t.Fail()
-			return
+			t.Fatal(err)
 		}
 	}
 }
 
 func TestMarkAsRead(t *testing.T) {
-
-	client, err := testSetup()
+	client, err := PreTestSetup()
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
 	feed, err := client.NotificationFeed("notification", "larry")
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	feed.AddActivities([]*Activity{
-		&Activity{
-			Actor:  FeedID("flat:larry"),
-			Object: FeedID("notification:larry"),
+	feed.AddActivities([]*getstream.Activity{
+		&getstream.Activity{
+			Actor:  getstream.FeedID("flat:larry"),
+			Object: getstream.FeedID("notification:larry"),
 			Verb:   "post",
 		},
 	})
@@ -501,9 +410,7 @@ func TestMarkAsRead(t *testing.T) {
 	for _, result := range output.Results {
 		err = feed.MarkActivitiesAsRead(result.Activities)
 		if err != nil {
-			fmt.Println(err)
-			t.Fail()
-			return
+			t.Fatal(err)
 		}
 	}
 
@@ -515,11 +422,93 @@ func TestMarkAsRead(t *testing.T) {
 	}
 
 	for _, result := range output.Results {
-		err = testCleanUp(client, nil, result.Activities, nil)
+		err = PostTestCleanUp(client, nil, result.Activities, nil)
 		if err != nil {
-			fmt.Println(err)
-			t.Fail()
-			return
+			t.Fatal(err)
 		}
+	}
+}
+
+func TestNotificationActivityMetaData(t *testing.T) {
+
+	now := time.Now()
+
+	data := struct {
+		Foo  string
+		Fooz string
+	}{
+		Foo:  "foo",
+		Fooz: "fooz",
+	}
+
+	dataB, err := json.Marshal(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	raw := json.RawMessage(dataB)
+
+	activity := getstream.Activity{
+		ForeignID: uuid.New(),
+		Actor:     getstream.FeedID("user:eric"),
+		Object:    getstream.FeedID("user:bob"),
+		Target:    getstream.FeedID("user:john"),
+		Origin:    getstream.FeedID("user:barry"),
+		Verb:      "post",
+		TimeStamp: &now,
+		Data:      &raw,
+		MetaData: map[string]string{
+			"meta": "data",
+		},
+	}
+
+	b, err := json.Marshal(&activity)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	b2, err := json.Marshal(activity)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resultActivity := getstream.Activity{}
+	err = json.Unmarshal(b, &resultActivity)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resultActivity2 := getstream.Activity{}
+	err = json.Unmarshal(b2, &resultActivity2)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if resultActivity.ForeignID != activity.ForeignID {
+		t.Error(activity.ForeignID, resultActivity.ForeignID)
+	}
+	if resultActivity.Actor != activity.Actor {
+		t.Error(activity.Actor, resultActivity.Actor)
+	}
+	if resultActivity.Origin != activity.Origin {
+		t.Error(activity.Origin, resultActivity.Origin)
+	}
+	if resultActivity.Verb != activity.Verb {
+		t.Error(activity.Verb, resultActivity.Verb)
+	}
+	if resultActivity.Object != activity.Object {
+		t.Error(activity.Object, resultActivity.Object)
+	}
+	if resultActivity.Target != activity.Target {
+		t.Error(activity.Target, resultActivity.Target)
+	}
+	if resultActivity.TimeStamp.Format("2006-01-02T15:04:05.999999") != activity.TimeStamp.Format("2006-01-02T15:04:05.999999") {
+		t.Error(activity.TimeStamp, resultActivity.TimeStamp)
+	}
+	if resultActivity.MetaData["meta"] != activity.MetaData["meta"] {
+		t.Error(activity.MetaData, resultActivity.MetaData)
+	}
+	if string(*resultActivity.Data) != string(*activity.Data) {
+		t.Error(string(*activity.Data), string(*resultActivity.Data))
 	}
 }

@@ -1,25 +1,24 @@
-package getstream
+package getstream_test
 
 import (
 	"encoding/json"
-	"fmt"
 	"testing"
 	"time"
+
+	getstream "github.com/GetStream/stream-go"
 )
 
 func TestError(t *testing.T) {
 
 	errorResponse := "{\"code\": 5, \"detail\": \"some detail\", \"duration\": \"36ms\", \"exception\": \"an exception\", \"status_code\": 400}"
 
-	var getStreamError Error
+	var getStreamError getstream.Error
 	err := json.Unmarshal([]byte(errorResponse), &getStreamError)
 	if err != nil {
-		fmt.Println(err)
-		t.Fail()
-		return
+		t.Fatal(err)
 	}
 
-	testError := Error{
+	testError := getstream.Error{
 		Code:        5,
 		Detail:      "some detail",
 		RawDuration: "36ms",
@@ -28,24 +27,21 @@ func TestError(t *testing.T) {
 	}
 
 	if getStreamError != testError {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 
 	if getStreamError.Duration() != time.Millisecond*36 {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 
 	if getStreamError.Error() != "an exception (36ms): some detail" {
-		fmt.Println(err)
-		t.Fail()
+		t.Error(err)
 	}
 }
 
 func TestErrorBadDuration(t *testing.T) {
 
-	testError := Error{
+	testError := getstream.Error{
 		Code:        5,
 		Detail:      "some detail",
 		RawDuration: "36blah",
@@ -54,8 +50,7 @@ func TestErrorBadDuration(t *testing.T) {
 	}
 
 	if testError.Duration() != time.Duration(0) {
-		t.Fail()
-		return
+		t.Fatal()
 	}
 
 }

@@ -11,10 +11,9 @@ func (f FeedID) Value() string {
 // Feed is the interface bundling all Feed Types
 // It exposes methods needed for all Types
 type Feed interface {
-	Client() *Client
 	Signature() string
 	FeedID() FeedID
-	feedIDWithoutColon() string
+	FeedIDWithoutColon() string
 	Token() string
 	SignFeed(signer *Signer)
 	GenerateToken(signer *Signer) string

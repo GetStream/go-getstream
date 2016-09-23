@@ -171,7 +171,6 @@ func (a *Activity) UnmarshalJSON(b []byte) (err error) {
 			}
 
 			for _, to := range to1D {
-
 				feed := GeneralFeed{}
 
 				match, err := regexp.MatchString(`^\w+:\w+ .*?$`, to)

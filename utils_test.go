@@ -1,82 +1,61 @@
-package getstream
+package getstream_test
 
-import "os"
+import (
+	"testing"
 
-func testSetup() (*Client, error) {
+	getstream "github.com/GetStream/stream-go"
+)
 
-	testAPIKey := os.Getenv("key")
-	testAPISecret := os.Getenv("secret")
-	testAppID := os.Getenv("app_id")
-	testRegion := os.Getenv("region")
-
-	client, err := New(testAPIKey, testAPISecret, testAppID, testRegion)
+func TestFeedSlug(t *testing.T) {
+	feedSlug, err := getstream.ValidateFeedSlug("foo")
 	if err != nil {
-		return nil, err
+		t.Error(err)
+	}
+	if feedSlug != "foo" {
+		t.Error("feedSlug not 'foo'")
 	}
 
-	return client, nil
-
+	feedSlug, err = getstream.ValidateFeedSlug("f-o-o")
+	if err != nil {
+		t.Error(err)
+	}
+	if feedSlug != "f_o_o" {
+		t.Error("feedSlug not 'f_o_o'")
+	}
 }
 
-func testCleanUp(client *Client, flats []*Activity, notifications []*Activity, aggregations []*Activity) error {
-
-	if len(flats) > 0 {
-
-		feed, err := client.FlatFeed("flat", "bob")
-		if err != nil {
-			return err
-		}
-
-		for _, activity := range flats {
-			err := feed.RemoveActivity(activity)
-			if err != nil {
-				return err
-			}
-		}
+func TestFeedID(t *testing.T) {
+	feedID, err := getstream.ValidateFeedID("123")
+	if err != nil {
+		t.Error(err)
+	}
+	if feedID != "123" {
+		t.Error("feedID not '123'")
 	}
 
-	if len(notifications) > 0 {
-
-		feed, err := client.NotificationFeed("notification", "bob")
-		if err != nil {
-			return err
-		}
-
-		for _, activity := range notifications {
-			err := feed.RemoveActivity(activity)
-			if err != nil {
-				return err
-			}
-		}
+	feedID, err = getstream.ValidateFeedID("1-2-3")
+	if err != nil {
+		t.Error(err)
 	}
-
-	if len(aggregations) > 0 {
-
-		feed, err := client.AggregatedFeed("aggregated", "bob")
-		if err != nil {
-			return err
-		}
-
-		for _, activity := range aggregations {
-			err := feed.RemoveActivity(activity)
-			if err != nil {
-				return err
-			}
-		}
+	if feedID != "1_2_3" {
+		t.Error("feedID not '1_2_3'")
 	}
-
-	return nil
 }
 
-func testCleanUpFollows(client *Client, flats []*FlatFeed) error {
-
-	for _, flat := range flats {
-
-		followers, _ := flat.FollowersWithLimitAndSkip(300, 0)
-
-		for _, follower := range followers {
-			follower.Unfollow(client, flat)
-		}
+func TestUserID(t *testing.T) {
+	userID, err := getstream.ValidateUserID("123")
+	if err != nil {
+		t.Error(err)
 	}
-	return nil
+	if userID != "123" {
+		t.Error("userID not '123'")
+	}
+
+	userID, err = getstream.ValidateUserID("1-2-3")
+	if err != nil {
+		t.Error(err)
+	}
+	if userID != "1_2_3" {
+		t.Error("userSlug not '1_2_3'")
+	}
 }

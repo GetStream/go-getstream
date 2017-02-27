@@ -12,7 +12,7 @@ go:
 
 env:
   global:
-    - STREAM_REGION=qa
+    - STREAM_REGION=sni
 
 notifications:
   email:

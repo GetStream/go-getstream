@@ -18,10 +18,5 @@ notifications:
   email:
     - ian@getstream.io
 
-branches:
-  only:
-  - master
-  - dev
-
 after_success:
   - bash <(curl -s https://codecov.io/bash)

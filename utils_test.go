@@ -25,14 +25,14 @@ func TestFeedSlug(t *testing.T) {
 		},
 		{
 			"Slug with word chars and dashes",
-			"f-o-o",
+			"f_o_o",
 
-			"f-o-o",
+			"f_o_o",
 			"",
 		},
 		{
 			"Slug with invalid chars",
-			"foo@",
+			"f-o-o",
 
 			"",
 			"invalid feedSlug",
@@ -70,14 +70,14 @@ func TestFeedID(t *testing.T) {
 		},
 		{
 			"Feed ID word chars and dashes",
-			"1-2-3",
+			"1_2_3",
 
-			"1-2-3",
+			"1_2_3",
 			"",
 		},
 		{
 			"Feed ID with invalid chars",
-			"123@",
+			"1-2-3",
 
 			"",
 			"invalid feedID",

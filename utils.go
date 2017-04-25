@@ -5,10 +5,10 @@ import (
 	"regexp"
 )
 
-var validWord = regexp.MustCompile(`^[\w|-]+$`)
-
 func ValidateFeedSlug(feedSlug string) (string, error) {
-	if !validWord.MatchString(feedSlug) {
+	validFeedSlug := regexp.MustCompile(`^\w+$`)
+
+	if !validFeedSlug.MatchString(feedSlug) {
 		return "", errors.New("invalid feedSlug")
 	}
 
@@ -16,7 +16,9 @@ func ValidateFeedSlug(feedSlug string) (string, error) {
 }
 
 func ValidateFeedID(feedID string) (string, error) {
-	if !validWord.MatchString(feedID) {
+	validFeedID := regexp.MustCompile(`^\w+$`)
+
+	if !validFeedID.MatchString(feedID) {
 		return "", errors.New("invalid feedID")
 	}
 
@@ -24,7 +26,9 @@ func ValidateFeedID(feedID string) (string, error) {
 }
 
 func ValidateUserID(userID string) (string, error) {
-	if !validWord.MatchString(userID) {
+	validUserID := regexp.MustCompile(`^[\w-]+$`)
+
+	if !validUserID.MatchString(userID) {
 		return "", errors.New("invalid userID")
 	}
 

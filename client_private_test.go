@@ -31,12 +31,12 @@ func TestClientSetStandardParams(t *testing.T) {
 			APIKey: "my_api_key",
 		},
 	}
-	tmpUrl, err := url.Parse("/")
+	tempURL, err := url.Parse("/")
 	if err != nil {
 		t.Fatal(err)
 	}
-	apiUrl := client.BaseURL.ResolveReference(tmpUrl)
-	query := apiUrl.Query()
+	apiURL := client.BaseURL.ResolveReference(tempURL)
+	query := apiURL.Query()
 	query = client.setStandardParams(query)
 
 	if _, ok := query["api_key"]; !ok {
@@ -63,12 +63,12 @@ func TestClientSetRequestParams(t *testing.T) {
 			APIKey: "my_api_key",
 		},
 	}
-	tmpUrl, err := url.Parse("/")
+	tempURL, err := url.Parse("/")
 	if err != nil {
 		t.Fatal(err)
 	}
-	apiUrl := client.BaseURL.ResolveReference(tmpUrl)
-	query := apiUrl.Query()
+	apiURL := client.BaseURL.ResolveReference(tempURL)
+	query := apiURL.Query()
 
 	// passing no params should give us nothing back
 	values := client.setRequestParams(query, map[string]string{})

@@ -21,14 +21,12 @@ type Client struct {
 	Signer  *Signer
 }
 
-/**
- * New returns a GetStream client.
- *
- * Params:
- *   cfg, pointer to a Config structure which takes the API credentials, Location, etc
- * Returns:
- *   Client struct
- */
+// New returns a GetStream client.
+//
+// Params:
+//   cfg, pointer to a Config structure which takes the API credentials, Location, etc
+// Returns:
+//   Client struct
 func New(cfg *Config) (*Client, error) {
 	var (
 		timeout int64
@@ -179,7 +177,7 @@ func (c *Client) AggregatedFeed(feedSlug string, userID string) (*AggregatedFeed
 	return feed, nil
 }
 
-// absoluteUrl create a url.URL instance and sets query params (bad!!!)
+// AbsoluteURL create a url.URL instance and sets query params (bad!!!)
 func (c *Client) AbsoluteURL(path string) (*url.URL, error) {
 	result, err := url.Parse(path)
 	if err != nil {
@@ -228,20 +226,20 @@ func (c *Client) del(f Feed, path string, payload []byte, params map[string]stri
 
 // request helper
 func (c *Client) request(f Feed, method string, path string, payload []byte, params map[string]string) ([]byte, error) {
-	apiUrl, err := url.Parse(path)
+	apiURL, err := url.Parse(path)
 	if err != nil {
 		return nil, err
 	}
 
-	apiUrl = c.BaseURL.ResolveReference(apiUrl)
+	apiURL = c.BaseURL.ResolveReference(apiURL)
 
-	query := apiUrl.Query()
+	query := apiURL.Query()
 	query = c.setStandardParams(query)
 	query = c.setRequestParams(query, params)
-	apiUrl.RawQuery = query.Encode()
+	apiURL.RawQuery = query.Encode()
 
 	// create a new http request
-	req, err := http.NewRequest(method, apiUrl.String(), bytes.NewBuffer(payload))
+	req, err := http.NewRequest(method, apiURL.String(), bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -249,8 +247,8 @@ func (c *Client) request(f Feed, method string, path string, payload []byte, par
 	// set the Auth headers for the http request
 	c.setBaseHeaders(req)
 
-	auth := ""
-	sig := ""
+	var auth string
+	var sig string
 	switch {
 	case path == "follow_many/": // one feed follows many feeds
 		auth = "app"
@@ -330,10 +328,9 @@ func (c *Client) setRequestParams(query url.Values, params map[string]string) ur
 	return query
 }
 
-/* setBaseHeaders - set common headers for every request
- * params:
- *    request, pointer to http.Request
- */
+// setBaseHeaders - set common headers for every request
+// params:
+// request, pointer to http.Request
 func (c *Client) setBaseHeaders(request *http.Request) {
 	request.Header.Set("X-Stream-Client", "stream-go-client-"+VERSION)
 	request.Header.Set("Content-Type", "application/json")
@@ -383,15 +380,14 @@ type PostFlatFeedFollowingManyInput struct {
 	Target string `json:"target"`
 }
 
-/** PrepFollowFlatFeed - prepares JSON needed for one feed to follow another
-
-Params:
-targetFeed, FlatFeed which wants to follow another
-sourceFeed, FlatFeed which is to be followed
-
-Returns:
-[]byte, array of bytes of JSON suitable for API consumption
-*/
+// PrepFollowFlatFeed - prepares JSON needed for one feed to follow another
+//
+// Params:
+// targetFeed, FlatFeed which wants to follow another
+// sourceFeed, FlatFeed which is to be followed
+//
+// Returns:
+// []byte, array of bytes of JSON suitable for API consumption
 func (c *Client) PrepFollowFlatFeed(targetFeed *FlatFeed, sourceFeed *FlatFeed) *PostFlatFeedFollowingManyInput {
 	return &PostFlatFeedFollowingManyInput{
 		Source: sourceFeed.FeedSlug + ":" + sourceFeed.UserID,

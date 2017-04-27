@@ -1,3 +1,7 @@
+# disclaimer
+
+This package is now actively maintained by GetStream.
+
 # stream-go
 
 [stream-go](https://github.com/GetStream/stream-go) is a (beta) Go client for [Stream](https://getstream.io/).
@@ -251,4 +255,3 @@ were made to the interface and internal workings.
 We received great support from Stream while creating this pkg for which
 we are very grateful, and we also want to thank them for creating
 Stream in the first place.
-

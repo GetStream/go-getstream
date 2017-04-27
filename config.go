@@ -62,7 +62,7 @@ func (c *Config) SetVersion(version string) string {
 	return c.Version
 }
 
-// SetBaseURL sets the core url of the GetStream API to use
+// SetToken sets the token of the GetStream API to use
 func (c *Config) SetToken(token string) string {
 	c.Token = token
 	return c.Token

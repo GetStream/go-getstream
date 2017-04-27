@@ -61,10 +61,9 @@ func TestActivityUnmarshallEmptyPayload(t *testing.T) {
 func TestActivityUnmarshallBadPayloadTime(t *testing.T) {
 	var err error
 	activity := &getstream.Activity{}
-	payload := []byte("{\"actor\":\"flat:john\",\"foreign_id\":\"82d2bb81-069d-427b-9238-8d822012e6d7\",\"object\":\"flat:eric\",\"origin\":\"\",\"time\":\"2016-09-22T21:44:58.821577\",\"verb\":\"post\"}")
 
 	// empty json value for "time" should still set "time" to nil
-	payload = []byte("{\"actor\":\"flat:john\",\"foreign_id\":\"82d2bb81-069d-427b-9238-8d822012e6d7\",\"object\":\"flat:eric\",\"origin\":\"\",\"time\":{},\"verb\":\"post\"}")
+	payload := []byte("{\"actor\":\"flat:john\",\"foreign_id\":\"82d2bb81-069d-427b-9238-8d822012e6d7\",\"object\":\"flat:eric\",\"origin\":\"\",\"time\":{},\"verb\":\"post\"}")
 	err = activity.UnmarshalJSON(payload)
 	if err != nil {
 		t.Fatal(err)
@@ -86,9 +85,9 @@ func TestActivityUnmarshallBadPayloadTime(t *testing.T) {
 func TestActivityUnmarshallBadPayloadTo(t *testing.T) {
 	var err error
 	activity := &getstream.Activity{}
-	payload := []byte("{\"actor\":\"flat:john\",\"foreign_id\":\"82d2bb81-069d-427b-9238-8d822012e6d7\",\"object\":\"flat:eric\",\"origin\":\"\",\"time\":\"2016-09-22T21:44:58.821577\",\"verb\":\"post\"}")
+
 	// empty json value for "to" should set "to" to nil
-	payload = []byte("{\"to\":null,\"actor\":\"flat:john\",\"foreign_id\":\"82d2bb81-069d-427b-9238-8d822012e6d7\",\"object\":\"flat:eric\",\"origin\":\"\",\"time\":\"2016-09-22T21:44:58.821577\",\"verb\":\"post\"}")
+	payload := []byte("{\"to\":null,\"actor\":\"flat:john\",\"foreign_id\":\"82d2bb81-069d-427b-9238-8d822012e6d7\",\"object\":\"flat:eric\",\"origin\":\"\",\"time\":\"2016-09-22T21:44:58.821577\",\"verb\":\"post\"}")
 	err = activity.UnmarshalJSON(payload)
 	if err != nil {
 		t.Fatal(err)

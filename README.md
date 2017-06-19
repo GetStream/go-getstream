@@ -59,23 +59,23 @@ if err != nil {
 }
 
 // but you can define the variables in code as well, of course
-APIKey string = "your-api-key"
-APISecret string = "your-api-secret"
+APIKey := "your-api-key"
+APISecret := "your-api-secret"
 
 // your application ID, found on your GetStream.io dashboard
-AppID string = "16013"
+AppID := "16013"
 
 // Location is optional; leaving it blank will default the
 // hostname to "api.getstream.io"
 // but we do have geographic-specific choices:
 // "us-east", "us-west" and "eu-west"
-Location string = "us-east"
+Location := "us-east"
 
 // TimeoutInt is an optional integer parameter to define
 // the number of seconds before your connection will hang-up
 // during a request; you can set this to any non-negative
 // and non-zero whole number, and will default to 3
-TimeoutInt: 3
+TimeoutInt := 3
 
 client, err := getstream.New(&getstream.Config{
     APIKey:      APIKey,

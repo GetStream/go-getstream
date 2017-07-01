@@ -272,17 +272,6 @@ func (c *Client) request(f Feed, method string, path string, payload []byte, par
 		sig = "sig"
 	}
 
-	// fallback: if we were going to use jwt and we don't have a client token, use regular sig instead
-	//if sig == "jwt" && c.Config.Token == "" {
-	//	if f == nil {
-	//		sig = "httpsig"
-	//	} else {
-	//		auth = "feed"
-	//		f.GenerateToken(c.Signer)
-	//		sig = "sig"
-	//	}
-	//}
-
 	c.setAuthSigAndHeaders(req, f, auth, sig, path)
 
 	// perform the http request

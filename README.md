@@ -20,19 +20,6 @@ with them to get a final license in place. Stream will be modifying the codebase
 together with MrHenry over time, so we especially want to point out how great they
 have been working with us to release this library.
 
-### Beta
-
-We are releasing this as our v0.9.0 beta since there may be bugs, and inevitable cleanup
-will happen along the way. Please do not hesitate to [contact us](mailto:support@getstream.io)
-if you see something strange happening. We'd be happy to consider any and all pull
-requests from the community as well!
-
-### Roadmap
-
-- Improved test coverage (currently around 84%)
-- Refactoring to make some methods and attributes private which don't need exposure
-- Ensuring Go best practices
-
 ### Full documentation
 
 Documentation for this Go client are available at the [Stream website](https://getstream.io/docs/?language=go).
@@ -52,7 +39,6 @@ client, err := getstream.New(&getstream.Config{
     APISecret:   os.Getenv("STREAM_API_SECRET"),
     AppID:       os.Getenv("STREAM_APP_ID"),
     Location:    os.Getenv("STREAM_REGION"),
-    TimeoutInt:  os.Getenv("STREAM_TIMEOUT"),
 })
 if err != nil {
     return err

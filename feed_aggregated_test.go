@@ -263,7 +263,7 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 	}
 
 	// get feedB's followers, ensure feedA is there
-	followers, err := feedB.FollowersWithLimitAndSkip(5, 0)
+	followers, err := feedB.GetFollowers(5, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -272,7 +272,7 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 	}
 
 	// get things that feedA follows, ensure feedB is in there
-	following, err := feedA.FollowingWithLimitAndSkip(5, 0)
+	following, err := feedA.GetFollowings(5, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -348,7 +348,7 @@ func TestAggregatedFeedFollowingFollowers(t *testing.T) {
 		t.Fail()
 	}
 
-	_, err = feedA.FollowingWithLimitAndSkip(20, 0)
+	_, err = feedA.GetFollowings(20, 0)
 	if err != nil {
 		t.Fail()
 	}

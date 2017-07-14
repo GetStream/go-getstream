@@ -330,7 +330,7 @@ func TestNotificationFeedFollowingFollowers(t *testing.T) {
 		t.Fail()
 	}
 
-	_, err = feedA.FollowingWithLimitAndSkip(20, 0)
+	_, err = feedA.GetFollowings(20, 0)
 	if err != nil {
 		t.Fail()
 	}

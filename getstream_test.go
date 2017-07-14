@@ -84,7 +84,7 @@ func PostTestCleanUp(
 
 func PostTestCleanUpFlatFeedFollows(client *getstream.Client, feeds []*getstream.FlatFeed) error {
 	for _, feed := range feeds {
-		followers, _ := feed.FollowersWithLimitAndSkip(300, 0)
+		followers, _ := feed.GetFollowers(300, 0)
 
 		for _, follower := range followers {
 			follower.Unfollow(feed)

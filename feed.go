@@ -32,13 +32,12 @@ type Feed interface {
 	RemoveActivity(input *Activity) error
 	RemoveActivityByForeignID(input *Activity) error
 
+	FollowFeedWithCopyLimit(target Feed, copyLimit int) error
 	Unfollow(target *FlatFeed) error
 	UnfollowKeepingHistory(target *FlatFeed) error
 
-	FollowFeedWithCopyLimit(target Feed, copyLimit int) error
-
-	//TODO: change this to return a list of []Feed
-	FollowersWithLimitAndSkip(limit int, skip int) ([]*GeneralFeed, error)
+	GetFollowers(limit int, offset int) ([]*GeneralFeed, error)
+	GetFollowings(limit int, offset int) ([]*GeneralFeed, error)
 }
 
 // A collection of common code between all feeds
@@ -200,15 +199,14 @@ type feedFollows struct {
 	} `json:"results"`
 }
 
-// FollowersWithLimitAndSkip returns a list of GeneralFeed that are following the feed
-// TODO: rename skip into offset
-func (f *baseFeed) FollowersWithLimitAndSkip(limit int, skip int) ([]*GeneralFeed, error) {
+// GetFollowers returns a list of GeneralFeed that are following the feed
+func (f *baseFeed) GetFollowers(limit int, offset int) ([]*GeneralFeed, error) {
 	var err error
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "followers" + "/"
 	params := map[string]string{
 		"limit":  strconv.Itoa(limit),
-		"offset": strconv.Itoa(skip),
+		"offset": strconv.Itoa(offset),
 	}
 
 	if err != nil {
@@ -249,14 +247,14 @@ func (f *baseFeed) FollowersWithLimitAndSkip(limit int, skip int) ([]*GeneralFee
 
 // FollowingWithLimitAndSkip returns a list of GeneralFeed followed by the current FlatFeed
 // TODO: need to support filters
-func (f *baseFeed) FollowingWithLimitAndSkip(limit int, skip int) ([]*GeneralFeed, error) {
+func (f *baseFeed) GetFollowings(limit int, offset int) ([]*GeneralFeed, error) {
 	var err error
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/"
 
 	params := map[string]string{
 		"limit":  strconv.Itoa(limit),
-		"offset": strconv.Itoa(skip),
+		"offset": strconv.Itoa(offset),
 	}
 
 	resultBytes, err := f.Client.get(f, endpoint, nil, params)

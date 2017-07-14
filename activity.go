@@ -22,7 +22,8 @@ type Activity struct {
 	Data      *json.RawMessage
 	MetaData  map[string]string
 
-	To []FeedID
+	To       []FeedID
+	signedTo []string
 }
 
 // MarshalJSON is the custom marshal function for Activities
@@ -61,13 +62,8 @@ func (a Activity) MarshalJSON() ([]byte, error) {
 		payload["time"] = a.TimeStamp.Format("2006-01-02T15:04:05.999999")
 	}
 
-	var tos []FeedID
-	for _, feed := range a.To {
-		tos = append(tos, FeedID(feed))
-	}
-
-	if len(tos) > 0 {
-		payload["to"] = tos
+	if len(a.signedTo) > 0 {
+		payload["to"] = a.signedTo
 	}
 
 	return json.Marshal(payload)

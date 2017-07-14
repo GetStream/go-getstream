@@ -84,10 +84,26 @@ func (f *baseFeed) GenerateToken(signer *Signer) string {
 	return ""
 }
 
+func (f *baseFeed) signToField(activity *Activity) {
+	for i := range activity.To {
+		bits := strings.Split(string(activity.To[i]), ":")
+		if len(bits) != 2 {
+			continue
+		}
+		signature := f.Client.Signer.SignFeed(strings.Join(bits, ""))
+		signedTo := fmt.Sprintf("%s %s", activity.To[i], signature)
+		activity.signedTo = append(activity.signedTo, signedTo)
+	}
+}
+
 // AddActivity is used to add an Activity
 func (f *baseFeed) AddActivity(activity *Activity) (*Activity, error) {
+	var activityCopy Activity
 
-	payload, err := json.Marshal(activity)
+	activityCopy = *activity
+	f.signToField(&activityCopy)
+	payload, err := json.Marshal(activityCopy)
+
 	if err != nil {
 		return nil, err
 	}
@@ -110,9 +126,19 @@ func (f *baseFeed) AddActivity(activity *Activity) (*Activity, error) {
 
 // AddActivities is used to add multiple Activities
 func (f *baseFeed) AddActivities(activities []*Activity) ([]*Activity, error) {
+	var (
+		activityCopy   Activity
+		activitiesCopy []*Activity
+	)
+
+	for i := range activities {
+		activityCopy = *activities[i]
+		f.signToField(&activityCopy)
+		activitiesCopy = append(activitiesCopy, &activityCopy)
+	}
 
 	payload, err := json.Marshal(map[string][]*Activity{
-		"activities": activities,
+		"activities": activitiesCopy,
 	})
 	if err != nil {
 		return nil, err
@@ -206,6 +232,7 @@ func (f *baseFeed) GetFollowers(limit int, offset int) ([]*GeneralFeed, error) {
 	for _, result := range output.Results {
 
 		feed := GeneralFeed{}
+		feed.Client = f.Client
 
 		var match bool
 		match, err = regexp.MatchString(`^.*?:.*?$`, result.FeedID)

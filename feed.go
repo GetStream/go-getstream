@@ -148,21 +148,10 @@ func (f *baseFeed) RemoveActivity(input *Activity) error {
 
 // RemoveActivityByForeignID removes an Activity by ForeignID
 func (f *baseFeed) RemoveActivityByForeignID(input *Activity) error {
-
 	if input.ForeignID == "" {
 		return errors.New("no ForeignID")
 	}
-
-	r, err := regexp.Compile("^[a-z0-9]{8}-[a-z0-9]{4}-[1-5][a-z0-9]{3}-[a-z0-9]{4}-[a-z0-9]{12}$")
-	if err != nil {
-		return err
-	}
-	if !r.MatchString(input.ForeignID) {
-		return errors.New("invalid ForeignID")
-	}
-
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + input.ForeignID + "/"
-
 	return f.Client.del(f, endpoint, nil, map[string]string{
 		"foreign_id": "1",
 	})

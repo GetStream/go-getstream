@@ -350,7 +350,7 @@ func TestMarkAsSeen(t *testing.T) {
 	}
 
 	feed.AddActivities([]*getstream.Activity{
-		&getstream.Activity{
+		{
 			Actor:  "flat:larry",
 			Object: "notification:larry",
 			Verb:   "post",

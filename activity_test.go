@@ -107,16 +107,6 @@ func TestActivityUnmarshallBadPayloadTo(t *testing.T) {
 		t.Fatal("To payload was bad JSON, expected To to be nil afterward, got:", activity.To)
 	}
 
-	// two-dimensional To should set To to ... something?
-	payload = []byte("{\"to\":[\"bob\"],\"actor\":\"flat:john\",\"foreign_id\":\"82d2bb81-069d-427b-9238-8d822012e6d7\",\"object\":\"flat:eric\",\"origin\":\"\",\"time\":\"2016-09-22T21:44:58.821577\",\"verb\":\"post\"}")
-	err = activity.UnmarshalJSON(payload)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(activity.To) != 0 {
-		t.Fatal("To payload was bad JSON, expected To to be nil afterward, got:", activity.To)
-	}
-
 	// malformed To userID should null out To
 	payload = []byte("{\"to\":[{\"bob\"}],\"actor\":\"flat:john\",\"foreign_id\":\"82d2bb81-069d-427b-9238-8d822012e6d7\",\"object\":\"flat:eric\",\"origin\":\"\",\"time\":\"2016-09-22T21:44:58.821577\",\"verb\":\"post\"}")
 	err = activity.UnmarshalJSON(payload)

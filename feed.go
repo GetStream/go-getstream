@@ -2,7 +2,6 @@ package getstream
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -29,8 +28,8 @@ type Feed interface {
 	AddActivity(activity *Activity) (*Activity, error)
 	AddActivities(activities []*Activity) ([]*Activity, error)
 
-	RemoveActivity(input *Activity) error
-	RemoveActivityByForeignID(input *Activity) error
+	RemoveActivity(activityId string) error
+	RemoveActivityByForeignID(foreignId string) error
 
 	FollowFeedWithCopyLimit(target Feed, copyLimit int) error
 	Unfollow(target *FlatFeed) error
@@ -138,20 +137,15 @@ func (f *baseFeed) AddActivities(activities []*Activity) ([]*Activity, error) {
 	return output.Activities, err
 }
 
-// RemoveActivity removes an Activity
-func (f *baseFeed) RemoveActivity(input *Activity) error {
-
-	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + input.ID + "/"
-
+// RemoveActivity removes an Activity by its ID
+func (f *baseFeed) RemoveActivity(activityId string) error {
+	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + activityId + "/"
 	return f.Client.del(f, endpoint, nil, nil)
 }
 
-// RemoveActivityByForeignID removes an Activity by ForeignID
-func (f *baseFeed) RemoveActivityByForeignID(input *Activity) error {
-	if input.ForeignID == "" {
-		return errors.New("no ForeignID")
-	}
-	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + input.ForeignID + "/"
+// RemoveActivityByForeignID performs a delete by ForeignID
+func (f *baseFeed) RemoveActivityByForeignID(foreignId string) error {
+	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + foreignId + "/"
 	return f.Client.del(f, endpoint, nil, map[string]string{
 		"foreign_id": "1",
 	})
@@ -167,14 +161,12 @@ func (f *baseFeed) Unfollow(target *FlatFeed) error {
 // this means that Activities already visibile will remain
 func (f *baseFeed) UnfollowKeepingHistory(target *FlatFeed) error {
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/" + target.FeedID().Value() + "/"
-
 	payload, err := json.Marshal(map[string]string{
 		"keep_history": "1",
 	})
 	if err != nil {
 		return err
 	}
-
 	return f.Client.del(f, endpoint, payload, nil)
 }
 

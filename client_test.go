@@ -280,71 +280,6 @@ func TestClientInit(t *testing.T) {
 	}
 }
 
-/*
-func TestClientInitWithToken(t *testing.T) {
-	serverClient, err := PreTestSetupWithToken()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if serverClient.Signer == nil {
-		t.Fatal("Required Signer is nil")
-	}
-
-	serverFeed, err := serverClient.FlatFeed("flat", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	token, err := serverClient.Signer.GenerateFeedScopeToken(
-		getstream.ScopeContextAll,
-		getstream.ScopeActionAll,
-		serverFeed.FeedIDWithoutColon())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if token == "" {
-		t.Fatal("signer generated feed scope token is blank")
-	}
-
-	// now we're going to pass that token from above into a new client instead of APISecret
-
-	clientClient, err := getstream.New(&getstream.Config{
-		APIKey:   os.Getenv("STREAM_API_KEY"),
-		Token:    token, // pass token instead of API Secret
-		AppID:    os.Getenv("STREAM_APP_ID"),
-		Location: os.Getenv("STREAM_REGION")})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feed, err := clientClient.FlatFeed("flat", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	activity, err := feed.AddActivity(&getstream.Activity{
-		Verb:      "post",
-		ForeignID: uuid.New(),
-		Object:    getstream.FeedID("flat:eric"),
-		Actor:     getstream.FeedID("flat:john"),
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if activity.Verb != "post" && activity.ForeignID != "48d024fe-3752-467a-8489-23febd1dec4e" {
-		t.Fail()
-	}
-
-	// tests passed, do cleanup
-
-	err = PostTestCleanUp(clientClient, []*getstream.Activity{activity}, nil, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-*/
-
 func TestClientBaseURL(t *testing.T) {
 	client, err := getstream.New(&getstream.Config{
 		APIKey:    "my_key",
@@ -445,11 +380,11 @@ func TestAddActivityToMany(t *testing.T) {
 	}
 
 	// cleanup
-	err = sallyFeed.RemoveActivityByForeignID(activity)
+	err = sallyFeed.RemoveActivityByForeignID(activity.ID)
 	if err != nil {
 		t.Error(err)
 	}
-	err = bobFeed.RemoveActivityByForeignID(activity)
+	err = bobFeed.RemoveActivityByForeignID(activity.ID)
 	if err != nil {
 		t.Error(err)
 	}

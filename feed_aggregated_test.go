@@ -125,11 +125,7 @@ func TestAggregatedFeedRemoveActivity(t *testing.T) {
 		t.Fail()
 	}
 
-	rmActivity := getstream.Activity{
-		ID: activity.ID,
-	}
-
-	err = feed.RemoveActivity(&rmActivity)
+	err = feed.RemoveActivity(activity.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -165,7 +161,7 @@ func TestAggregatedFeedRemoveByForeignIDActivity(t *testing.T) {
 	}
 	_ = rmActivity
 
-	err = feed.RemoveActivityByForeignID(activity)
+	err = feed.RemoveActivityByForeignID(activity.ID)
 	if err != nil {
 		t.Fatal(err)
 	}

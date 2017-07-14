@@ -44,7 +44,7 @@ func PostTestCleanUp(
 		}
 
 		for _, activity := range flats {
-			err := feed.RemoveActivity(activity)
+			err := feed.RemoveActivity(activity.ID)
 			if err != nil {
 				return err
 			}
@@ -58,7 +58,7 @@ func PostTestCleanUp(
 		}
 
 		for _, activity := range notifications {
-			err := feed.RemoveActivity(activity)
+			err := feed.RemoveActivity(activity.ID)
 			if err != nil {
 				return err
 			}
@@ -72,7 +72,7 @@ func PostTestCleanUp(
 		}
 
 		for _, activity := range aggregations {
-			err := feed.RemoveActivity(activity)
+			err := feed.RemoveActivity(activity.ID)
 			if err != nil {
 				return err
 			}

@@ -132,7 +132,7 @@ func TestFlatFeedUUID(t *testing.T) {
 			continue
 		}
 
-		err = feed.RemoveActivityByForeignID(activity)
+		err = feed.RemoveActivityByForeignID(activity.ForeignID)
 		if err != nil {
 			t.Log("fail remove activity with UUID :", err)
 		}
@@ -167,11 +167,7 @@ func TestFlatFeedRemoveActivity(t *testing.T) {
 		t.Fail()
 	}
 
-	rmActivity := getstream.Activity{
-		ID: activity.ID,
-	}
-
-	err = feed.RemoveActivity(&rmActivity)
+	err = feed.RemoveActivity(activity.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,12 +198,7 @@ func TestFlatFeedRemoveByForeignIDActivity(t *testing.T) {
 		t.Fail()
 	}
 
-	rmActivity := getstream.Activity{
-		ForeignID: activity.ForeignID,
-	}
-	_ = rmActivity
-
-	err = feed.RemoveActivityByForeignID(activity)
+	err = feed.RemoveActivityByForeignID(activity.ForeignID)
 	if err != nil {
 		t.Fatal(err)
 	}

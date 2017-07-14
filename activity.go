@@ -131,32 +131,12 @@ func (a *Activity) UnmarshalJSON(b []byte) (err error) {
 		} else if lowerKey == "data" {
 			a.Data = value
 		} else if lowerKey == "to" {
-
-			var to1D []string
-			var to2D [][]string
-
-			err := json.Unmarshal(*value, &to1D)
-			if err != nil {
-				err = nil
-				err = json.Unmarshal(*value, &to2D)
-				if err != nil {
-					continue
-				}
-
-				for _, to := range to2D {
-					if len(to) == 2 {
-						feedStr := to[0] + " " + to[1]
-						to1D = append(to1D, feedStr)
-					} else if len(to) == 1 {
-						to1D = append(to1D, to[0])
-					}
+			var to []string
+			if err := json.Unmarshal(*value, &to); err == nil {
+				for _, to := range to {
+					a.To = append(a.To, FeedID(to))
 				}
 			}
-
-			for _, to := range to1D {
-				a.To = append(a.To, FeedID(to))
-			}
-
 		} else {
 			var strValue string
 			json.Unmarshal(*value, &strValue)

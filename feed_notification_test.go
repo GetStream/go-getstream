@@ -85,7 +85,7 @@ func TestNotificationFeedAddActivityWithTo(t *testing.T) {
 		ForeignID: uuid.New(),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
-		To:        []getstream.Feed{feedTo},
+		To:        []getstream.FeedID{feedTo.FeedID()},
 	})
 	if err != nil {
 		t.Error(err)
@@ -194,7 +194,7 @@ func TestNotificationFeedActivities(t *testing.T) {
 		t.Error(err)
 	}
 
-	activities, err := feed.Activities(&getstream.GetNotificationFeedInput{})
+	activities, err := feed.Activities(getstream.GetNotificationFeedInput{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -359,7 +359,7 @@ func TestMarkAsSeen(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	output, _ := feed.Activities(nil)
+	output, _ := feed.Activities(getstream.GetNotificationFeedInput{})
 	if output.Unseen == 0 {
 		t.Fail()
 	}
@@ -368,7 +368,7 @@ func TestMarkAsSeen(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	output, _ = feed.Activities(nil)
+	output, _ = feed.Activities(getstream.GetNotificationFeedInput{})
 	if output.Unseen != 0 {
 		t.Fail()
 	}
@@ -402,7 +402,7 @@ func TestMarkAsRead(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	output, _ := feed.Activities(nil)
+	output, _ := feed.Activities(getstream.GetNotificationFeedInput{})
 	if output.Unread == 0 {
 		t.Fail()
 	}
@@ -416,7 +416,7 @@ func TestMarkAsRead(t *testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	output, _ = feed.Activities(nil)
+	output, _ = feed.Activities(getstream.GetNotificationFeedInput{})
 	if output.Unread != 0 {
 		t.Fail()
 	}

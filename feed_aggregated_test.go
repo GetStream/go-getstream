@@ -85,7 +85,7 @@ func TestAggregatedFeedAddActivityWithTo(t *testing.T) {
 		ForeignID: uuid.New(),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
-		To:        []getstream.Feed{toFeed},
+		To:        []getstream.FeedID{toFeed.FeedID()},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -194,7 +194,7 @@ func TestAggregatedFeedActivities(t *testing.T) {
 		t.Error(err)
 	}
 
-	activities, err := feed.Activities(&getstream.GetAggregatedFeedInput{})
+	activities, err := feed.Activities(getstream.GetAggregatedFeedInput{})
 	if err != nil {
 		t.Fatal(err)
 	}

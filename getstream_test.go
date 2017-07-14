@@ -87,7 +87,7 @@ func PostTestCleanUpFlatFeedFollows(client *getstream.Client, feeds []*getstream
 		followers, _ := feed.FollowersWithLimitAndSkip(300, 0)
 
 		for _, follower := range followers {
-			follower.Unfollow(client, feed)
+			follower.Unfollow(feed)
 		}
 	}
 	return nil

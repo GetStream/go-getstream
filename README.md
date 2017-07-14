@@ -2,23 +2,9 @@
 
 [stream-go](https://github.com/GetStream/stream-go) is a (beta) Go client for [Stream](https://getstream.io/).
 
-You can sign up for a Stream account at https://getstream.io/get_started.
+[![godoc](https://godoc.org/github.com/GetStream/stream-go?status.svg)](https://godoc.org/github.com/GetStream/stream-go)
 
--Master Branch: [![Build Status](https://travis-ci.org/GetStream/stream-go.svg?branch=master)](https://travis-ci.org/GetStream/stream-go)
-
--Dev Branch: [![Build Status](https://travis-ci.org/GetStream/stream-go.svg?branch=dev)](https://travis-ci.org/GetStream/stream-go)
-
-[![godoc](https://godoc.org/github.com/GetStream/stream-go?status.svg)](https://godoc.org/github.com/GetStream/stream-go) [![codecov](https://codecov.io/gh/GetStream/stream-go/branch/master/graph/badge.svg)](https://codecov.io/gh/GetStream/stream-go)
-
-This library could not exist without the efforts of several open-source community members,
-including the awesome folks at [MrHenry](//github.com/mrhenry) and
-[HyperWorks](//github.com/hyperworks). Thank you so much for contributing
-to our community!
-
-The code provided by the MrHenry team is used with written permission; we are working
-with them to get a final license in place. Stream will be modifying the codebase
-together with MrHenry over time, so we especially want to point out how great they
-have been working with us to release this library.
+[![codecov](https://codecov.io/gh/GetStream/stream-go/branch/master/graph/badge.svg)](https://codecov.io/gh/GetStream/stream-go)
 
 ### Full documentation
 
@@ -155,42 +141,6 @@ if err != nil {
 JWT support is not yet fully tested on the library, but we'd love to
 hear any feedback you have as you try it out.
 
-### API Support
-
-Flat Feed
-
-- [x] Add one or more Activities (AddActivity, AddActivities)
-- [x] Remove Activity (RemoveActivity, RemoveActivityByForeignID)
-- [x] Get a list of Activities on the Feed (Activities)
-- [x] Follow another Feed (FollowFeedWithCopyLimit)
-- [x] UnFollow another Feed (Unfollow, UnfollowAggregated, UnfollowNotification, UnfollowKeepingHistory)
-- [x] Get Followers of this Feed (FollowersWithLimitAndSkip)
-- [x] Get list of Feeds this Feed is Following (FollowingWithLimitAndSkip)
-- [x] Follow Many Feeds (FollowManyFeeds)
-- [x] Update one or more Activities (UpdateActivity, UpdateActivities)
-
-Aggregated Feed
-
-- [x] Add one or more Activities (AddActivity, AddActivities)
-- [x] Remove Activity (RemoveActivity, RemoveActivityByForeignID)
-- [x] Get a list of Activities on the Feed (Activities)
-- [x] Follow another Feed (FollowFeedWithCopyLimit)
-- [x] UnFollow another Feed (Unfollow, UnfollowKeepingHistory)
-- [x] Get Followers of this Feed (FollowersWithLimitAndSkip)
-- [x] Get list of Feeds this Feed is Following (FollowingWithLimitAndSkip)
-
-Notification Feed
-
-- [x] Add one or more Activities (AddActivity, AddActivities)
-- [x] Remove Activity (RemoveActivity, RemoveActivityByForeignID)
-- [x] Get a list of Activities on the Feed (Activities)
-- [x] Follow another Feed (FollowFeedWithCopyLimit)
-- [x] UnFollow another Feed (Unfollow, UnfollowKeepingHistory)
-- [x] Get list of Feeds this Feed is Following (FollowingWithLimitAndSkip)
-- [x] Mark Read (MarkActivitiesAsRead)
-- [x] Mark Seen (MarkActivitiesAsSeenWithLimit)
-- [x] Get Followers of this Feed (FollowersWithLimitAndSkip)
-
 ### Activity Payload Structure
 
 Payload building Follows our API standards for all request payloads
@@ -207,34 +157,3 @@ overwritten.
 
 The benefit of this `metadata` structure is that these key/value pairs
 will be exposed to Stream's internals such as ranking.
-
-### Design Choices
-
-Many design choices in the library were inherited from the team at MrHenry,
-with some choices to refactor some of the test code as its own getstream_test
-package. This choice meant exposing some attributes that perhaps should
-be left private, and we expect this re-refactoring will take place over
-time.
-
-The MrHenry team noted this about the Flat / Aggregated / Notification
-Feed types:
-- they have separate structures and methods to prevent the impact of
-future Stream changes
-- if two types of feeds grow farther apart, incorporated future changes
-in this client should not breaking everything
-
-### Credits
-
-Have we mentioned the team at [MrHenry](//github.com/mrhenry) yet??
-
-##### Credits from MrHenry that we wanted to pass along as well:
-
-This pkg started out as a fork from [HyperWorks](//github.com/hyperworks/go-getstream)
-and still borrows snippets (token & errors) from the original. We
-decided to make this a separate repo entirely because drastic changes
-were made to the interface and internal workings.
-
-We received great support from Stream while creating this pkg for which
-we are very grateful, and we also want to thank them for creating
-Stream in the first place.
-

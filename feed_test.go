@@ -1,50 +1,11 @@
-package getstream_test
+package getstream
 
 import (
-	"github.com/GetStream/stream-go"
 	"testing"
 )
 
-func TestGeneralFeedBasic(t *testing.T) {
-	client, err := getstream.New(&getstream.Config{
-		APIKey:    "a key",
-		APISecret: "a secret",
-		AppID:     "11111",
-		Location:  "us-east"})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	general := getstream.GeneralFeed{
-		Client:   client,
-		FeedSlug: "feedGroup",
-		UserID:   "feedName",
-	}
-
-	if "feedGroupfeedName" != general.Signature() {
-		t.Fatal()
-	}
-
-	if "feedGroup:feedName" != string(general.FeedID()) {
-		t.Fatal()
-	}
-
-	general.SignFeed(general.Client.Signer)
-	if "NWH8lcFHfHYEc2xdMs2kOhM-oII" != general.Token() {
-		t.Fatal()
-	}
-
-	if "NWH8lcFHfHYEc2xdMs2kOhM-oII" != general.GenerateToken(general.Client.Signer) {
-		t.Fatal()
-	}
-
-	if "feedGroupfeedName NWH8lcFHfHYEc2xdMs2kOhM-oII" != general.Signature() {
-		t.Fatal()
-	}
-}
-
 func TestFlatFeedBasic(t *testing.T) {
-	client, err := getstream.New(&getstream.Config{
+	client, err := New(&Config{
 		APIKey:    "a key",
 		APISecret: "a secret",
 		AppID:     "11111",
@@ -53,10 +14,12 @@ func TestFlatFeedBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	flatFeed := getstream.FlatFeed{
-		Client:   client,
-		FeedSlug: "feedGroup",
-		UserID:   "feedName",
+	flatFeed := FlatFeed{
+		baseFeed{
+			Client:   client,
+			FeedSlug: "feedGroup",
+			UserID:   "feedName",
+		},
 	}
 
 	if "feedGroupfeedName" != flatFeed.Signature() {
@@ -82,7 +45,7 @@ func TestFlatFeedBasic(t *testing.T) {
 }
 
 func TestNotificationFeedBasic(t *testing.T) {
-	client, err := getstream.New(&getstream.Config{
+	client, err := New(&Config{
 		APIKey:    "a key",
 		APISecret: "a secret",
 		AppID:     "11111",
@@ -91,10 +54,12 @@ func TestNotificationFeedBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	notificationFeed := getstream.NotificationFeed{
-		Client:   client,
-		FeedSlug: "feedGroup",
-		UserID:   "feedName",
+	notificationFeed := NotificationFeed{
+		baseFeed{
+			Client:   client,
+			FeedSlug: "feedGroup",
+			UserID:   "feedName",
+		},
 	}
 
 	if "feedGroupfeedName" != notificationFeed.Signature() {

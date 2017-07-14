@@ -9,15 +9,7 @@ go:
   - 1.5
   - 1.6
   - 1.7
-
-notifications:
-  email:
-    - ian@getstream.io
-
-branches:
-  only:
-  - master
-  - dev
+  - 1.8
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

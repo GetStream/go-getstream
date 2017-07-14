@@ -2,7 +2,6 @@ package getstream
 
 import (
 	"encoding/json"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -23,7 +22,7 @@ type Activity struct {
 	Data      *json.RawMessage
 	MetaData  map[string]string
 
-	To []Feed
+	To []FeedID
 }
 
 // MarshalJSON is the custom marshal function for Activities
@@ -62,13 +61,9 @@ func (a Activity) MarshalJSON() ([]byte, error) {
 		payload["time"] = a.TimeStamp.Format("2006-01-02T15:04:05.999999")
 	}
 
-	var tos []string
+	var tos []FeedID
 	for _, feed := range a.To {
-		to := feed.FeedID().Value()
-		if feed.Token() != "" {
-			to += " " + feed.Token()
-		}
-		tos = append(tos, to)
+		tos = append(tos, FeedID(feed))
 	}
 
 	if len(tos) > 0 {
@@ -163,41 +158,9 @@ func (a *Activity) UnmarshalJSON(b []byte) (err error) {
 			}
 
 			for _, to := range to1D {
-				feed := GeneralFeed{}
-
-				match, err := regexp.MatchString(`^\w+:\w+ .*?$`, to)
-				if err != nil {
-					continue
-				}
-
-				if match {
-					firstSplit := strings.Split(to, ":")
-					secondSplit := strings.Split(firstSplit[1], " ")
-
-					feed.FeedSlug = firstSplit[0]
-					feed.UserID = secondSplit[0]
-					feed.token = secondSplit[1]
-					a.To = append(a.To, &feed)
-					continue
-				}
-
-				match = false
-				err = nil
-
-				match, err = regexp.MatchString(`^\w+:\w+$`, to)
-				if err != nil {
-					continue
-				}
-
-				if match {
-					firstSplit := strings.Split(to, ":")
-
-					feed.FeedSlug = firstSplit[0]
-					feed.UserID = firstSplit[1]
-					a.To = append(a.To, &feed)
-					continue
-				}
+				a.To = append(a.To, FeedID(to))
 			}
+
 		} else {
 			var strValue string
 			json.Unmarshal(*value, &strValue)

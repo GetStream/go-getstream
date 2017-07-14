@@ -118,9 +118,11 @@ func (c *Client) FlatFeed(feedSlug string, userID string) (*FlatFeed, error) {
 	}
 
 	feed := &FlatFeed{
-		Client:   c,
-		FeedSlug: feedSlug,
-		UserID:   userID,
+		baseFeed{
+			Client:   c,
+			FeedSlug: feedSlug,
+			UserID:   userID,
+		},
 	}
 
 	feed.SignFeed(c.Signer)
@@ -144,9 +146,11 @@ func (c *Client) NotificationFeed(feedSlug string, userID string) (*Notification
 	}
 
 	feed := &NotificationFeed{
-		Client:   c,
-		FeedSlug: feedSlug,
-		UserID:   userID,
+		baseFeed{
+			Client:   c,
+			FeedSlug: feedSlug,
+			UserID:   userID,
+		},
 	}
 
 	feed.SignFeed(c.Signer)
@@ -170,9 +174,11 @@ func (c *Client) AggregatedFeed(feedSlug string, userID string) (*AggregatedFeed
 	}
 
 	feed := &AggregatedFeed{
-		Client:   c,
-		FeedSlug: feedSlug,
-		UserID:   userID,
+		baseFeed{
+			Client:   c,
+			FeedSlug: feedSlug,
+			UserID:   userID,
+		},
 	}
 
 	feed.SignFeed(c.Signer)

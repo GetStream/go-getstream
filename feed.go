@@ -31,6 +31,7 @@ type Feed interface {
 	RemoveActivity(activityId string) error
 	RemoveActivityByForeignID(foreignId string) error
 
+	Follow(target Feed) error
 	FollowFeedWithCopyLimit(target Feed, copyLimit int) error
 	Unfollow(target *FlatFeed) error
 	UnfollowKeepingHistory(target *FlatFeed) error

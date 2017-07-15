@@ -98,10 +98,10 @@ func (f *baseFeed) signToField(activity *Activity) {
 
 // AddActivity is used to add an Activity
 func (f *baseFeed) AddActivity(activity *Activity) (*Activity, error) {
-	var activityCopy Activity
+	var activityCopy *Activity
 
-	activityCopy = *activity
-	f.signToField(&activityCopy)
+	*activityCopy = *activity
+	f.signToField(activityCopy)
 	payload, err := json.Marshal(activityCopy)
 
 	if err != nil {
@@ -127,14 +127,14 @@ func (f *baseFeed) AddActivity(activity *Activity) (*Activity, error) {
 // AddActivities is used to add multiple Activities
 func (f *baseFeed) AddActivities(activities []*Activity) ([]*Activity, error) {
 	var (
-		activityCopy   Activity
+		activityCopy   *Activity
 		activitiesCopy []*Activity
 	)
 
 	for i := range activities {
-		activityCopy = *activities[i]
-		f.signToField(&activityCopy)
-		activitiesCopy = append(activitiesCopy, &activityCopy)
+		*activityCopy = *activities[i]
+		f.signToField(activityCopy)
+		activitiesCopy = append(activitiesCopy, activityCopy)
 	}
 
 	payload, err := json.Marshal(map[string][]*Activity{

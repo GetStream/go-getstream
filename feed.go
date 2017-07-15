@@ -33,8 +33,8 @@ type Feed interface {
 
 	Follow(target Feed) error
 	FollowFeedWithCopyLimit(target Feed, copyLimit int) error
-	Unfollow(target *FlatFeed) error
-	UnfollowKeepingHistory(target *FlatFeed) error
+	Unfollow(target Feed) error
+	UnfollowKeepingHistory(target Feed) error
 
 	GetFollowers(limit int, offset int) ([]FeedID, error)
 	GetFollowings(limit int, offset int) ([]FeedID, error)
@@ -185,14 +185,14 @@ func (f *baseFeed) RemoveActivityByForeignID(foreignId string) error {
 }
 
 // Unfollow is used to Unfollow a target Feed
-func (f *baseFeed) Unfollow(target *FlatFeed) error {
+func (f *baseFeed) Unfollow(target Feed) error {
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/" + target.FeedID().Value() + "/"
 	return f.Client.del(f, endpoint, nil, nil)
 }
 
 // UnfollowKeepingHistory is used to Unfollow a target Feed while keeping the History
 // this means that Activities already visibile will remain
-func (f *baseFeed) UnfollowKeepingHistory(target *FlatFeed) error {
+func (f *baseFeed) UnfollowKeepingHistory(target Feed) error {
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/" + target.FeedID().Value() + "/"
 	payload, err := json.Marshal(map[string]string{
 		"keep_history": "1",

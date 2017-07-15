@@ -8,13 +8,6 @@ type FlatFeed struct {
 	baseFeed
 }
 
-// GetFlatFeedInput is used to Get a list of Activities from a FlatFeed
-type GetFlatFeedInput struct {
-	typeFeedReadOptions
-
-	Ranking string
-}
-
 // GetFlatFeedOutput is the response from a FlatFeed Activities Get Request
 type GetFlatFeedOutput struct {
 	Duration   string      `json:"duration"`
@@ -23,7 +16,7 @@ type GetFlatFeedOutput struct {
 }
 
 // Activities returns a list of Activities for a FlatFeedGroup
-func (f *FlatFeed) Activities(input *GetFlatFeedInput) (*GetFlatFeedOutput, error) {
+func (f *FlatFeed) Activities(input FeedReadOptions) (*GetFlatFeedOutput, error) {
 	var err error
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/"

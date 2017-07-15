@@ -295,37 +295,3 @@ func (f *baseFeed) FollowFeedWithCopyLimit(target Feed, copyLimit int) error {
 	_, err = f.Client.post(f, endpoint, payload, nil)
 	return err
 }
-
-type typeFeedReadOptions struct {
-	Limit  int
-	Offset int
-
-	IDGTE string
-	IDGT  string
-	IDLTE string
-	IDLT  string
-}
-
-func (i *typeFeedReadOptions) Params() (params map[string]string) {
-	params = make(map[string]string)
-
-	if i.Limit != 0 {
-		params["limit"] = fmt.Sprintf("%d", i.Limit)
-	}
-	if i.Offset != 0 {
-		params["offset"] = fmt.Sprintf("%d", i.Offset)
-	}
-	if i.IDGTE != "" {
-		params["id_gte"] = i.IDGTE
-	}
-	if i.IDGT != "" {
-		params["id_gt"] = i.IDGT
-	}
-	if i.IDLTE != "" {
-		params["id_lte"] = i.IDLTE
-	}
-	if i.IDLT != "" {
-		params["id_lt"] = i.IDLT
-	}
-	return params
-}

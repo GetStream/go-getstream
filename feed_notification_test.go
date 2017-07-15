@@ -123,7 +123,7 @@ func TestNotificationFeedActivities(t *testing.T) {
 		t.Error(err)
 	}
 
-	_, err = feed.Activities(getstream.GetNotificationFeedInput{})
+	_, err = feed.Activities(getstream.NewFeedReadOptions())
 	if err != nil {
 		t.Error(err)
 	}
@@ -202,14 +202,14 @@ func TestMarkAsSeen(t *testing.T) {
 		},
 	})
 
-	output, _ := feed.Activities(getstream.GetNotificationFeedInput{})
+	output, _ := feed.Activities(getstream.NewFeedReadOptions())
 	if output.Unseen == 0 {
 		t.Fail()
 	}
 
 	feed.MarkActivitiesAsSeenWithLimit(15)
 
-	output, _ = feed.Activities(getstream.GetNotificationFeedInput{})
+	output, _ = feed.Activities(getstream.NewFeedReadOptions())
 	if output.Unseen != 0 {
 		t.Fail()
 	}
@@ -229,7 +229,7 @@ func TestMarkAsRead(t *testing.T) {
 		},
 	})
 
-	output, _ := feed.Activities(getstream.GetNotificationFeedInput{})
+	output, _ := feed.Activities(getstream.NewFeedReadOptions())
 	if output.Unread == 0 {
 		t.Fail()
 	}
@@ -241,7 +241,7 @@ func TestMarkAsRead(t *testing.T) {
 		}
 	}
 
-	output, _ = feed.Activities(getstream.GetNotificationFeedInput{})
+	output, _ = feed.Activities(getstream.NewFeedReadOptions())
 	if output.Unread != 0 {
 		t.Fail()
 	}

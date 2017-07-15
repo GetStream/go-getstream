@@ -1,7 +1,6 @@
 language: go
 
 install:
-  - go get github.com/pborman/uuid
   - go get gopkg.in/LeisureLink/httpsig.v1
   - go get gopkg.in/dgrijalva/jwt-go.v3
 

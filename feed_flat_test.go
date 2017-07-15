@@ -17,7 +17,7 @@ func TestExampleFlatFeedAddActivity(t *testing.T) {
 	client := PreTestSetup(t)
 	feed := getFlatFeed(client)
 
-	activity, err := feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: RandString(8),
 		Object:    "flat:eric",
@@ -26,8 +26,6 @@ func TestExampleFlatFeedAddActivity(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	_ = activity
 }
 
 func TestFlatFeedAddActivity(t *testing.T) {
@@ -152,7 +150,7 @@ func TestFlatFeedGetActivities(t *testing.T) {
 		t.Error(err)
 	}
 
-	activities, err := feed.Activities(&getstream.GetFlatFeedInput{})
+	activities, err := feed.Activities(getstream.NewFeedReadOptions())
 	if err != nil {
 		t.Error(err)
 	}

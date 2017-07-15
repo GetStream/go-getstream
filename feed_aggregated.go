@@ -8,11 +8,6 @@ type AggregatedFeed struct {
 	baseFeed
 }
 
-// GetAggregatedFeedInput is used to Get a list of Activities from a AggregatedFeed
-type GetAggregatedFeedInput struct {
-	typeFeedReadOptions
-}
-
 // GetAggregatedFeedOutput is the response from a AggregatedFeed Activities Get Request
 type GetAggregatedFeedOutput struct {
 	Duration string
@@ -98,7 +93,7 @@ type getAggregatedFeedOutputResult struct {
 }
 
 // Activities returns a list of Activities for a NotificationFeedGroup
-func (f *AggregatedFeed) Activities(input GetAggregatedFeedInput) (*GetAggregatedFeedOutput, error) {
+func (f *AggregatedFeed) Activities(input FeedReadOptions) (*GetAggregatedFeedOutput, error) {
 	var (
 		payload []byte
 		err     error

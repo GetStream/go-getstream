@@ -122,7 +122,7 @@ func TestAggregatedFeedActivities(t *testing.T) {
 		t.Error(err)
 	}
 
-	_, err = feed.Activities(getstream.GetAggregatedFeedInput{})
+	_, err = feed.Activities(getstream.NewFeedReadOptions())
 	if err != nil {
 		t.Fatal(err)
 	}

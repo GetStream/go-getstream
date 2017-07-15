@@ -10,11 +10,6 @@ type NotificationFeed struct {
 	baseFeed
 }
 
-// GetNotificationFeedInput is used to Get a list of Activities from a NotificationFeed
-type GetNotificationFeedInput struct {
-	typeFeedReadOptions
-}
-
 // GetNotificationFeedOutput is the response from a NotificationFeed Activities Get Request
 type GetNotificationFeedOutput struct {
 	Duration string
@@ -146,7 +141,7 @@ func (f *NotificationFeed) MarkActivitiesAsSeenWithLimit(limit int) error {
 }
 
 // Activities returns a list of Activities for a NotificationFeedGroup
-func (f *NotificationFeed) Activities(input GetNotificationFeedInput) (*GetNotificationFeedOutput, error) {
+func (f *NotificationFeed) Activities(input FeedReadOptions) (*GetNotificationFeedOutput, error) {
 	var (
 		payload []byte
 		err     error

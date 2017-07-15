@@ -313,45 +313,6 @@ func TestAggregatedFeedFollowKeepingHistory(t *testing.T) {
 	PostTestCleanUpFlatFeedFollows(client, []*getstream.FlatFeed{feedB})
 }
 
-func TestAggregatedFeedFollowingFollowers(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feedA, err := client.AggregatedFeed("aggregated", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feedB, err := client.FlatFeed("flat", "eric")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feedC, err := client.FlatFeed("flat", "barry")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
-	if err != nil {
-		t.Fail()
-	}
-
-	err = feedA.FollowFeedWithCopyLimit(feedC, 20)
-	if err != nil {
-		t.Fail()
-	}
-
-	_, err = feedA.GetFollowings(20, 0)
-	if err != nil {
-		t.Fail()
-	}
-
-	PostTestCleanUpFlatFeedFollows(client, []*getstream.FlatFeed{feedB, feedC})
-}
-
 func TestAggregatedActivityMetaData(t *testing.T) {
 	now := time.Now()
 

@@ -2,6 +2,7 @@ package getstream
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -165,12 +166,18 @@ func (f *baseFeed) AddActivities(activities []*Activity) ([]*Activity, error) {
 
 // RemoveActivity removes an Activity by its ID
 func (f *baseFeed) RemoveActivity(activityId string) error {
+	if activityId == "" {
+		return errors.New("activityId must be a non empty string")
+	}
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + activityId + "/"
 	return f.Client.del(f, endpoint, nil, nil)
 }
 
 // RemoveActivityByForeignID performs a delete by ForeignID
 func (f *baseFeed) RemoveActivityByForeignID(foreignId string) error {
+	if foreignId == "" {
+		return errors.New("foreignId must be a non empty string")
+	}
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + foreignId + "/"
 	return f.Client.del(f, endpoint, nil, map[string]string{
 		"foreign_id": "1",

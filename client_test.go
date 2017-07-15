@@ -380,11 +380,11 @@ func TestAddActivityToMany(t *testing.T) {
 	}
 
 	// cleanup
-	err = sallyFeed.RemoveActivity(activity.ID)
+	err = sallyFeed.RemoveActivityByForeignID(activity.ForeignID)
 	if err != nil {
 		t.Error(err)
 	}
-	err = bobFeed.RemoveActivity(activity.ID)
+	err = bobFeed.RemoveActivityByForeignID(activity.ForeignID)
 	if err != nil {
 		t.Error(err)
 	}

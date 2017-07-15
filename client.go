@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"fmt"
 	"gopkg.in/LeisureLink/httpsig.v1"
+	"io"
 )
 
 // Client is used to connect to getstream.io
@@ -235,6 +235,8 @@ func (c *Client) del(f Feed, path string, payload []byte, params map[string]stri
 
 // request helper
 func (c *Client) request(f Feed, method string, path string, payload []byte, params map[string]string) ([]byte, error) {
+	var requestBody io.Reader
+
 	apiUrl, err := url.Parse(path)
 	if err != nil {
 		return nil, err
@@ -247,8 +249,14 @@ func (c *Client) request(f Feed, method string, path string, payload []byte, par
 	query = c.setRequestParams(query, params)
 	apiUrl.RawQuery = query.Encode()
 
+	if payload == nil {
+		requestBody = nil
+	} else {
+		requestBody = bytes.NewBuffer(payload)
+	}
+
 	// create a new http request
-	req, err := http.NewRequest(method, apiUrl.String(), bytes.NewBuffer(payload))
+	req, err := http.NewRequest(method, apiUrl.String(), requestBody)
 	if err != nil {
 		return nil, err
 	}
@@ -299,10 +307,6 @@ func (c *Client) request(f Feed, method string, path string, payload []byte, par
 	case resp.StatusCode/100 == 2: // SUCCESS
 		return body, nil
 	default:
-
-		//todo debug code
-		fmt.Println(string(body))
-
 		var respErr Error
 		err = json.Unmarshal(body, &respErr)
 		if err != nil {

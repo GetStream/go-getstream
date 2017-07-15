@@ -57,7 +57,6 @@ func TestAggregatedFeedAddActivity(t *testing.T) {
 		t.Error(err)
 	}
 
-	err = PostTestCleanUp(client, nil, nil, []*getstream.Activity{activity})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,7 +93,6 @@ func TestAggregatedFeedAddActivityWithTo(t *testing.T) {
 		t.Fail()
 	}
 
-	err = PostTestCleanUp(client, nil, nil, []*getstream.Activity{activity})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -165,7 +163,6 @@ func TestAggregatedFeedRemoveByForeignIDActivity(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	PostTestCleanUp(client, nil, nil, []*getstream.Activity{activity})
 }
 
 func TestAggregatedFeedActivities(t *testing.T) {
@@ -189,17 +186,11 @@ func TestAggregatedFeedActivities(t *testing.T) {
 		t.Error(err)
 	}
 
-	activities, err := feed.Activities(getstream.GetAggregatedFeedInput{})
+	_, err = feed.Activities(getstream.GetAggregatedFeedInput{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	for _, result := range activities.Results {
-		err = PostTestCleanUp(client, nil, nil, result.Activities)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
 }
 
 func TestAggregatedFeedAddActivities(t *testing.T) {
@@ -213,7 +204,7 @@ func TestAggregatedFeedAddActivities(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	activities, err := feed.AddActivities([]*getstream.Activity{
+	_, err = feed.AddActivities([]*getstream.Activity{
 		{
 			Verb:      "post",
 			ForeignID: RandString(8),
@@ -230,10 +221,6 @@ func TestAggregatedFeedAddActivities(t *testing.T) {
 		t.Error(err)
 	}
 
-	err = PostTestCleanUp(client, nil, nil, activities)
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func TestAggregatedFeedFollowUnfollow(t *testing.T) {
@@ -262,7 +249,7 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if followers[0].UserID != "bob" {
+	if followers[0] != "aggregated:bob" {
 		t.Error("Bob's aggregated feed is not a follower of FeedB")
 	}
 
@@ -271,7 +258,7 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if following[0].UserID != "eric" {
+	if following[0] != "flat:eric" {
 		t.Error("Eric's FeedB is not a follower of FeedA")
 	}
 
@@ -280,7 +267,6 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 		t.Fail()
 	}
 
-	PostTestCleanUpFlatFeedFollows(client, []*getstream.FlatFeed{feedB})
 }
 
 func TestAggregatedFeedFollowKeepingHistory(t *testing.T) {
@@ -309,7 +295,6 @@ func TestAggregatedFeedFollowKeepingHistory(t *testing.T) {
 		t.Fail()
 	}
 
-	PostTestCleanUpFlatFeedFollows(client, []*getstream.FlatFeed{feedB})
 }
 
 func TestAggregatedActivityMetaData(t *testing.T) {

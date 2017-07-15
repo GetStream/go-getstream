@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -36,8 +35,8 @@ type Feed interface {
 	Unfollow(target *FlatFeed) error
 	UnfollowKeepingHistory(target *FlatFeed) error
 
-	GetFollowers(limit int, offset int) ([]*GeneralFeed, error)
-	GetFollowings(limit int, offset int) ([]*GeneralFeed, error)
+	GetFollowers(limit int, offset int) ([]FeedID, error)
+	GetFollowings(limit int, offset int) ([]FeedID, error)
 }
 
 // A collection of common code between all feeds
@@ -214,8 +213,11 @@ type feedFollows struct {
 }
 
 // GetFollowers returns a list of GeneralFeed that are following the feed
-func (f *baseFeed) GetFollowers(limit int, offset int) ([]*GeneralFeed, error) {
-	var err error
+func (f *baseFeed) GetFollowers(limit int, offset int) ([]FeedID, error) {
+	var (
+		err         error
+		outputFeeds []FeedID
+	)
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "followers" + "/"
 	params := map[string]string{
@@ -235,35 +237,20 @@ func (f *baseFeed) GetFollowers(limit int, offset int) ([]*GeneralFeed, error) {
 		return nil, err
 	}
 
-	var outputFeeds []*GeneralFeed
 	for _, result := range output.Results {
-
-		feed := GeneralFeed{}
-		feed.Client = f.Client
-
-		var match bool
-		match, err = regexp.MatchString(`^.*?:.*?$`, result.FeedID)
-		if err != nil {
-			continue
-		}
-
-		if match {
-			firstSplit := strings.Split(result.FeedID, ":")
-
-			feed.FeedSlug = firstSplit[0]
-			feed.UserID = firstSplit[1]
-		}
-
-		outputFeeds = append(outputFeeds, &feed)
+		outputFeeds = append(outputFeeds, FeedID(result.FeedID))
 	}
 
 	return outputFeeds, err
 }
 
-// FollowingWithLimitAndSkip returns a list of GeneralFeed followed by the current FlatFeed
+// FollowingWithLimitAndSkip returns a list of FeedID followed by the current FlatFeed
 // TODO: need to support filters
-func (f *baseFeed) GetFollowings(limit int, offset int) ([]*GeneralFeed, error) {
-	var err error
+func (f *baseFeed) GetFollowings(limit int, offset int) ([]FeedID, error) {
+	var (
+		err         error
+		outputFeeds []FeedID
+	)
 
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/"
 
@@ -280,25 +267,8 @@ func (f *baseFeed) GetFollowings(limit int, offset int) ([]*GeneralFeed, error) 
 		return nil, err
 	}
 
-	var outputFeeds []*GeneralFeed
 	for _, result := range output.Results {
-
-		feed := GeneralFeed{}
-
-		var match bool
-		match, err = regexp.MatchString(`^.*?:.*?$`, result.FeedID)
-		if err != nil {
-			continue
-		}
-
-		if match {
-			firstSplit := strings.Split(result.TargetID, ":")
-
-			feed.FeedSlug = firstSplit[0]
-			feed.UserID = firstSplit[1]
-		}
-
-		outputFeeds = append(outputFeeds, &feed)
+		outputFeeds = append(outputFeeds, FeedID(result.FeedID))
 	}
 
 	return outputFeeds, err

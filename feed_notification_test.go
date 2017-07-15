@@ -57,10 +57,6 @@ func TestNotificationFeedAddActivity(t *testing.T) {
 		t.Fail()
 	}
 
-	err = PostTestCleanUp(client, nil, []*getstream.Activity{activity}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func TestNotificationFeedAddActivityWithTo(t *testing.T) {
@@ -94,10 +90,6 @@ func TestNotificationFeedAddActivityWithTo(t *testing.T) {
 		t.Fail()
 	}
 
-	err = PostTestCleanUp(client, nil, []*getstream.Activity{activity}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
 }
 
 func TestNotificationFeedRemoveActivity(t *testing.T) {
@@ -160,7 +152,6 @@ func TestNotificationFeedRemoveByForeignIDActivity(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	PostTestCleanUp(client, nil, []*getstream.Activity{activity}, nil)
 }
 
 func TestNotificationFeedActivities(t *testing.T) {
@@ -184,17 +175,11 @@ func TestNotificationFeedActivities(t *testing.T) {
 		t.Error(err)
 	}
 
-	activities, err := feed.Activities(getstream.GetNotificationFeedInput{})
+	_, err = feed.Activities(getstream.GetNotificationFeedInput{})
 	if err != nil {
 		t.Error(err)
 	}
 
-	for _, result := range activities.Results {
-		err = PostTestCleanUp(client, nil, result.Activities, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
 }
 
 func TestNotificationFeedAddActivities(t *testing.T) {
@@ -208,7 +193,7 @@ func TestNotificationFeedAddActivities(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	activities, err := feed.AddActivities([]*getstream.Activity{
+	_, err = feed.AddActivities([]*getstream.Activity{
 		&getstream.Activity{
 			Verb:      "post",
 			ForeignID: RandString(8),
@@ -223,11 +208,6 @@ func TestNotificationFeedAddActivities(t *testing.T) {
 	})
 	if err != nil {
 		t.Error(err)
-	}
-
-	err = PostTestCleanUp(client, nil, activities, nil)
-	if err != nil {
-		t.Fatal(err)
 	}
 }
 
@@ -257,7 +237,6 @@ func TestNotificationFeedFollow(t *testing.T) {
 		t.Fail()
 	}
 
-	PostTestCleanUpFlatFeedFollows(client, []*getstream.FlatFeed{feedB})
 }
 
 func TestNotificationFeedFollowKeepingHistory(t *testing.T) {
@@ -286,7 +265,6 @@ func TestNotificationFeedFollowKeepingHistory(t *testing.T) {
 		t.Fail()
 	}
 
-	PostTestCleanUpFlatFeedFollows(client, []*getstream.FlatFeed{feedB})
 }
 
 func TestMarkAsSeen(t *testing.T) {
@@ -324,12 +302,6 @@ func TestMarkAsSeen(t *testing.T) {
 		t.Fail()
 	}
 
-	for _, result := range output.Results {
-		err = PostTestCleanUp(client, nil, result.Activities, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
 }
 
 func TestMarkAsRead(t *testing.T) {
@@ -370,13 +342,6 @@ func TestMarkAsRead(t *testing.T) {
 	output, _ = feed.Activities(getstream.GetNotificationFeedInput{})
 	if output.Unread != 0 {
 		t.Fail()
-	}
-
-	for _, result := range output.Results {
-		err = PostTestCleanUp(client, nil, result.Activities, nil)
-		if err != nil {
-			t.Fatal(err)
-		}
 	}
 }
 

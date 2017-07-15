@@ -274,17 +274,18 @@ func (f *baseFeed) GetFollowings(limit int, offset int) ([]FeedID, error) {
 	return outputFeeds, err
 }
 
-// FollowFeedWithCopyLimit sets a Feed to follow another target Feed
-// CopyLimit is the maximum number of Activities to Copy from History
-func (f *baseFeed) FollowFeedWithCopyLimit(target Feed, copyLimit int) error {
+func (f *baseFeed) follow(target Feed, copyLimit *int) error {
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/"
 
 	input := struct {
 		Target            string `json:"target"`
-		ActivityCopyLimit int    `json:"activity_copy_limit"`
+		ActivityCopyLimit *int   `json:"activity_copy_limit,omitempty"`
 	}{
-		Target:            target.FeedID().Value(),
-		ActivityCopyLimit: copyLimit,
+		Target: target.FeedID().Value(),
+	}
+
+	if copyLimit != nil {
+		input.ActivityCopyLimit = copyLimit
 	}
 
 	payload, err := json.Marshal(input)
@@ -294,4 +295,15 @@ func (f *baseFeed) FollowFeedWithCopyLimit(target Feed, copyLimit int) error {
 
 	_, err = f.Client.post(f, endpoint, payload, nil)
 	return err
+}
+
+// Follow sets a Feed to follow another target Feed
+func (f *baseFeed) Follow(target Feed) error {
+	return f.follow(target, nil)
+}
+
+// FollowFeedWithCopyLimit sets a Feed to follow another target Feed
+// CopyLimit is the maximum number of Activities to Copy from History
+func (f *baseFeed) FollowFeedWithCopyLimit(target Feed, copyLimit int) error {
+	return f.follow(target, &copyLimit)
 }

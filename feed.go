@@ -268,7 +268,7 @@ func (f *baseFeed) GetFollowings(limit int, offset int) ([]FeedID, error) {
 	}
 
 	for _, result := range output.Results {
-		outputFeeds = append(outputFeeds, FeedID(result.FeedID))
+		outputFeeds = append(outputFeeds, FeedID(result.TargetID))
 	}
 
 	return outputFeeds, err

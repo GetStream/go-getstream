@@ -214,7 +214,6 @@ func TestFlatFeedFollow(t *testing.T) {
 	if following[0] != feedB.FeedID() {
 		t.Error("Eric's FeedB is not a follower of FeedA")
 	}
-
 }
 
 func TestFlatFeedFollowingFollowers(t *testing.T) {

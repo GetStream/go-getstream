@@ -1,10 +1,8 @@
 package getstream_test
 
 import (
-	"testing"
-
 	getstream "github.com/GetStream/stream-go"
-	"github.com/pborman/uuid"
+	"testing"
 )
 
 func TestClient(t *testing.T) {
@@ -219,7 +217,7 @@ func TestFlatFeedInputValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = client.FlatFeed("user", uuid.New())
+	_, err = client.FlatFeed("user", RandString(8))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -240,7 +238,7 @@ func TestNotificationFeedInputValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err = client.NotificationFeed("user", uuid.New())
+	_, err = client.NotificationFeed("user", RandString(8))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -369,7 +367,7 @@ func TestAddActivityToMany(t *testing.T) {
 
 	activity := &getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	}
@@ -387,14 +385,5 @@ func TestAddActivityToMany(t *testing.T) {
 	err = bobFeed.RemoveActivityByForeignID(activity.ForeignID)
 	if err != nil {
 		t.Error(err)
-	}
-}
-
-func TestConvertUUIDToWord(t *testing.T) {
-	expected := "f_o_o"
-	foo := getstream.ConvertUUIDToWord("f-o-o")
-
-	if foo != expected {
-		t.Fatal("ConvertUUIDToWord mismatch, expected '", expected, "', got:", foo)
 	}
 }

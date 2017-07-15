@@ -6,7 +6,6 @@ import (
 	"time"
 
 	getstream "github.com/GetStream/stream-go"
-	"github.com/pborman/uuid"
 )
 
 func TestExampleAggregatedFeed_AddActivity(t *testing.T) {
@@ -22,7 +21,7 @@ func TestExampleAggregatedFeed_AddActivity(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -46,7 +45,7 @@ func TestAggregatedFeedAddActivity(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -82,7 +81,7 @@ func TestAggregatedFeedAddActivityWithTo(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 		To:        []getstream.FeedID{toFeed.FeedID()},
@@ -144,7 +143,7 @@ func TestAggregatedFeedRemoveByForeignIDActivity(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -182,7 +181,7 @@ func TestAggregatedFeedActivities(t *testing.T) {
 
 	_, err = feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -217,12 +216,12 @@ func TestAggregatedFeedAddActivities(t *testing.T) {
 	activities, err := feed.AddActivities([]*getstream.Activity{
 		{
 			Verb:      "post",
-			ForeignID: uuid.New(),
+			ForeignID: RandString(8),
 			Object:    "flat:eric",
 			Actor:     "flat:john",
 		}, {
 			Verb:      "walk",
-			ForeignID: uuid.New(),
+			ForeignID: RandString(8),
 			Object:    "flat:john",
 			Actor:     "flat:eric",
 		},
@@ -332,7 +331,7 @@ func TestAggregatedActivityMetaData(t *testing.T) {
 	raw := json.RawMessage(dataB)
 
 	activity := getstream.Activity{
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Actor:     "user:eric",
 		Object:    "user:bob",
 		Target:    "user:john",

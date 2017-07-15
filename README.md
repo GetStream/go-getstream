@@ -84,11 +84,10 @@ if err != nil {
 
 Creating an activity on Bob's flat feed:
 ```go
-import "github.com/pborman/uuid"
 
 activity, err := bobFeed.AddActivity(&Activity{
     Verb:      "post",
-    ForeignID: uuid.New(),
+    ForeignID: "42",
     Object:    "flat:eric",
     Actor:     "flat:john",
 })

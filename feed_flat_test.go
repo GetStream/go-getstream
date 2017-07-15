@@ -6,7 +6,6 @@ import (
 	"time"
 
 	getstream "github.com/GetStream/stream-go"
-	"github.com/pborman/uuid"
 )
 
 func TestExampleFlatFeedAddActivity(t *testing.T) {
@@ -23,7 +22,7 @@ func TestExampleFlatFeedAddActivity(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -47,7 +46,7 @@ func TestFlatFeedAddActivity(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -88,7 +87,7 @@ func TestFlatFeedAddActivityWithTo(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 		To:        []getstream.FeedID{feedTo.FeedID(), feedToB.FeedID()},
@@ -123,7 +122,7 @@ func TestFlatFeedUUID(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		activity, err := feed.AddActivity(&getstream.Activity{
 			Verb:      "post",
-			ForeignID: uuid.New(),
+			ForeignID: RandString(8),
 			Object:    "flat:eric",
 			Actor:     "flat:john",
 		})
@@ -186,7 +185,7 @@ func TestFlatFeedRemoveByForeignIDActivity(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -219,7 +218,7 @@ func TestFlatFeedGetActivities(t *testing.T) {
 
 	_, err = feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -256,12 +255,12 @@ func TestFlatFeedAddActivities(t *testing.T) {
 	activities, err := feed.AddActivities([]*getstream.Activity{
 		{
 			Verb:      "post",
-			ForeignID: uuid.New(),
+			ForeignID: RandString(8),
 			Object:    "flat:eric",
 			Actor:     "flat:john",
 		}, {
 			Verb:      "walk",
-			ForeignID: uuid.New(),
+			ForeignID: RandString(8),
 			Object:    "flat:john",
 			Actor:     "flat:eric",
 		},
@@ -439,7 +438,7 @@ func TestFlatActivityMetaData(t *testing.T) {
 	raw := json.RawMessage(dataB)
 
 	activity := getstream.Activity{
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Actor:     "user:eric",
 		Object:    "user:bob",
 		Target:    "user:john",

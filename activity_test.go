@@ -5,13 +5,12 @@ import (
 	"testing"
 
 	getstream "github.com/GetStream/stream-go"
-	"github.com/pborman/uuid"
 )
 
 func TestActivityMarshallJson(t *testing.T) {
 	activity := &getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	}

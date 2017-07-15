@@ -6,7 +6,6 @@ import (
 	"time"
 
 	getstream "github.com/GetStream/stream-go"
-	"github.com/pborman/uuid"
 )
 
 func TestExampleNotificationFeed_AddActivity(t *testing.T) {
@@ -22,7 +21,7 @@ func TestExampleNotificationFeed_AddActivity(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -46,7 +45,7 @@ func TestNotificationFeedAddActivity(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -82,7 +81,7 @@ func TestNotificationFeedAddActivityWithTo(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 		To:        []getstream.FeedID{feedTo.FeedID()},
@@ -144,7 +143,7 @@ func TestNotificationFeedRemoveByForeignIDActivity(t *testing.T) {
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -177,7 +176,7 @@ func TestNotificationFeedActivities(t *testing.T) {
 
 	_, err = feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
@@ -212,12 +211,12 @@ func TestNotificationFeedAddActivities(t *testing.T) {
 	activities, err := feed.AddActivities([]*getstream.Activity{
 		&getstream.Activity{
 			Verb:      "post",
-			ForeignID: uuid.New(),
+			ForeignID: RandString(8),
 			Object:    "flat:eric",
 			Actor:     "flat:john",
 		}, &getstream.Activity{
 			Verb:      "walk",
-			ForeignID: uuid.New(),
+			ForeignID: RandString(8),
 			Object:    "flat:john",
 			Actor:     "flat:eric",
 		},
@@ -401,7 +400,7 @@ func TestNotificationActivityMetaData(t *testing.T) {
 	raw := json.RawMessage(dataB)
 
 	activity := getstream.Activity{
-		ForeignID: uuid.New(),
+		ForeignID: RandString(8),
 		Actor:     "user:eric",
 		Object:    "user:bob",
 		Target:    "user:john",

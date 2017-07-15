@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 )
 
@@ -192,8 +191,6 @@ func (c *Client) AbsoluteURL(path string) (*url.URL, error) {
 		return nil, err
 	}
 
-	// DEBUG: Use this line to send stuff to a proxy instead.
-	// c.baseURL, _ = url.Parse("http://0.0.0.0:8000/")
 	result = c.BaseURL.ResolveReference(result)
 
 	qs := result.Query()
@@ -206,13 +203,6 @@ func (c *Client) AbsoluteURL(path string) (*url.URL, error) {
 	result.RawQuery = qs.Encode()
 
 	return result, nil
-}
-
-// ConvertUUIDToWord replaces - with _
-// It is used by go-getstream to convert UUID to a string that matches the word regex
-// You can use it to convert UUID's to match go-getstream internals.
-func ConvertUUIDToWord(uuid string) string {
-	return strings.Replace(uuid, "-", "_", -1)
 }
 
 // get request helper

@@ -8,18 +8,16 @@ import (
 	getstream "github.com/GetStream/stream-go"
 )
 
+func getAggregatedFeed(client *getstream.Client) *getstream.AggregatedFeed {
+	f, _ := client.AggregatedFeed("aggregated", RandString(8))
+	return f
+}
+
 func TestExampleAggregatedFeed_AddActivity(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getAggregatedFeed(client)
 
-	feed, err := client.AggregatedFeed("flat", "UserID")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	activity, err := feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: RandString(8),
 		Object:    "flat:eric",
@@ -28,57 +26,30 @@ func TestExampleAggregatedFeed_AddActivity(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	_ = activity
 }
 
 func TestAggregatedFeedAddActivity(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getAggregatedFeed(client)
 
-	feed, err := client.AggregatedFeed("aggregated", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	activity, err := feed.AddActivity(&getstream.Activity{
+	fid := RandString(8)
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: RandString(8),
+		ForeignID: fid,
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
 	if err != nil {
-		t.Fatal(err)
-	}
-
-	if activity.Verb != "post" && activity.ForeignID != "48d024fe-3752-467a-8489-23febd1dec4e" {
 		t.Error(err)
-	}
-
-	if err != nil {
-		t.Fatal(err)
 	}
 }
 
 func TestAggregatedFeedAddActivityWithTo(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getAggregatedFeed(client)
+	toFeed := getAggregatedFeed(client)
 
-	feed, err := client.AggregatedFeed("aggregated", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	toFeed, err := client.AggregatedFeed("aggregated", "barry")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	activity, err := feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: RandString(8),
 		Object:    "flat:eric",
@@ -86,40 +57,22 @@ func TestAggregatedFeedAddActivityWithTo(t *testing.T) {
 		To:        []getstream.FeedID{toFeed.FeedID()},
 	})
 	if err != nil {
-		t.Fatal(err)
-	}
-
-	if activity.Verb != "post" && activity.ForeignID != "48d024fe-3752-467a-8489-23febd1dec4e" {
-		t.Fail()
-	}
-
-	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
 }
 
 func TestAggregatedFeedRemoveActivity(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feed, err := client.AggregatedFeed("aggregated", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getAggregatedFeed(client)
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:   "post",
 		Object: "flat:eric",
 		Actor:  "flat:john",
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	if activity.Verb != "post" {
-		t.Fail()
+	if err != nil {
+		t.Error(err)
 	}
 
 	err = feed.RemoveActivity(activity.ID)
@@ -129,28 +82,18 @@ func TestAggregatedFeedRemoveActivity(t *testing.T) {
 }
 
 func TestAggregatedFeedRemoveByForeignIDActivity(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getAggregatedFeed(client)
 
-	feed, err := client.AggregatedFeed("aggregated", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	fid := RandString(8)
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
-		ForeignID: RandString(8),
+		ForeignID: fid,
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
 	if err != nil {
 		t.Fatal(err)
-	}
-
-	if activity.Verb != "post" && activity.ForeignID != "08f01c47-014f-11e4-aa8f-0cc47a024be0" {
-		t.Fail()
 	}
 
 	rmActivity := getstream.Activity{
@@ -166,17 +109,10 @@ func TestAggregatedFeedRemoveByForeignIDActivity(t *testing.T) {
 }
 
 func TestAggregatedFeedActivities(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getAggregatedFeed(client)
 
-	feed, err := client.AggregatedFeed("aggregated", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: RandString(8),
 		Object:    "flat:eric",
@@ -194,17 +130,10 @@ func TestAggregatedFeedActivities(t *testing.T) {
 }
 
 func TestAggregatedFeedAddActivities(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getAggregatedFeed(client)
 
-	feed, err := client.AggregatedFeed("aggregated", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = feed.AddActivities([]*getstream.Activity{
+	_, err := feed.AddActivities([]*getstream.Activity{
 		{
 			Verb:      "post",
 			ForeignID: RandString(8),
@@ -224,22 +153,11 @@ func TestAggregatedFeedAddActivities(t *testing.T) {
 }
 
 func TestAggregatedFeedFollowUnfollow(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feedA := getAggregatedFeed(client)
+	feedB := getFlatFeed(client)
 
-	feedA, err := client.AggregatedFeed("aggregated", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feedB, err := client.FlatFeed("flat", "eric")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
+	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
 	if err != nil {
 		t.Fail()
 	}
@@ -249,8 +167,8 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if followers[0] != "aggregated:bob" {
-		t.Error("Bob's aggregated feed is not a follower of FeedB")
+	if followers[0] != feedA.FeedID() {
+		t.Error("feedA aggregated feed is not a follower of FeedB")
 	}
 
 	// get things that feedA follows, ensure feedB is in there
@@ -258,7 +176,7 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if following[0] != "flat:eric" {
+	if following[0] != feedB.FeedID() {
 		t.Error("Eric's FeedB is not a follower of FeedA")
 	}
 
@@ -270,22 +188,12 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 }
 
 func TestAggregatedFeedFollowKeepingHistory(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
 
-	feedA, err := client.AggregatedFeed("aggregated", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
+	feedA := getAggregatedFeed(client)
+	feedB := getFlatFeed(client)
 
-	feedB, err := client.FlatFeed("flat", "eric")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
+	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
 	if err != nil {
 		t.Fail()
 	}

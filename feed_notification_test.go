@@ -8,40 +8,29 @@ import (
 	getstream "github.com/GetStream/stream-go"
 )
 
+func getNotificationFeed(client *getstream.Client) *getstream.NotificationFeed {
+	f, _ := client.NotificationFeed("notification", RandString(8))
+	return f
+}
+
 func TestExampleNotificationFeed_AddActivity(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getNotificationFeed(client)
 
-	feed, err := client.NotificationFeed("flat", "UserID")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	activity, err := feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: RandString(8),
 		Object:    "flat:eric",
 		Actor:     "flat:john",
 	})
 	if err != nil {
-		t.Fatal(err)
+		t.Error(err)
 	}
-
-	_ = activity
 }
 
 func TestNotificationFeedAddActivity(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feed, err := client.NotificationFeed("notification", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getNotificationFeed(client)
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
@@ -60,22 +49,11 @@ func TestNotificationFeedAddActivity(t *testing.T) {
 }
 
 func TestNotificationFeedAddActivityWithTo(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getNotificationFeed(client)
+	feedTo := getNotificationFeed(client)
 
-	feed, err := client.NotificationFeed("notification", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feedTo, err := client.NotificationFeed("notification", "barry")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	activity, err := feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: RandString(8),
 		Object:    "flat:eric",
@@ -85,23 +63,11 @@ func TestNotificationFeedAddActivityWithTo(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	if activity.Verb != "post" && activity.ForeignID != "48d024fe-3752-467a-8489-23febd1dec4e" {
-		t.Fail()
-	}
-
 }
 
 func TestNotificationFeedRemoveActivity(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feed, err := client.NotificationFeed("notification", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getNotificationFeed(client)
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:   "post",
@@ -123,15 +89,8 @@ func TestNotificationFeedRemoveActivity(t *testing.T) {
 }
 
 func TestNotificationFeedRemoveByForeignIDActivity(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feed, err := client.NotificationFeed("notification", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getNotificationFeed(client)
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
@@ -143,10 +102,6 @@ func TestNotificationFeedRemoveByForeignIDActivity(t *testing.T) {
 		t.Error(err)
 	}
 
-	if activity.Verb != "post" && activity.ForeignID != "08f01c47-014f-11e4-aa8f-0cc47a024be0" {
-		t.Fail()
-	}
-
 	err = feed.RemoveActivityByForeignID(activity.ForeignID)
 	if err != nil {
 		t.Fatal(err)
@@ -155,17 +110,10 @@ func TestNotificationFeedRemoveByForeignIDActivity(t *testing.T) {
 }
 
 func TestNotificationFeedActivities(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getNotificationFeed(client)
 
-	feed, err := client.NotificationFeed("notification", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: RandString(8),
 		Object:    "flat:eric",
@@ -183,23 +131,16 @@ func TestNotificationFeedActivities(t *testing.T) {
 }
 
 func TestNotificationFeedAddActivities(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
+	feed := getNotificationFeed(client)
 
-	feed, err := client.NotificationFeed("notification", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	_, err = feed.AddActivities([]*getstream.Activity{
-		&getstream.Activity{
+	_, err := feed.AddActivities([]*getstream.Activity{
+		{
 			Verb:      "post",
 			ForeignID: RandString(8),
 			Object:    "flat:eric",
 			Actor:     "flat:john",
-		}, &getstream.Activity{
+		}, {
 			Verb:      "walk",
 			ForeignID: RandString(8),
 			Object:    "flat:john",
@@ -212,22 +153,13 @@ func TestNotificationFeedAddActivities(t *testing.T) {
 }
 
 func TestNotificationFeedFollow(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
 
-	feedA, err := client.NotificationFeed("notification", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
+	feedA := getNotificationFeed(client)
+	feedB := getFlatFeed(client)
 
-	feedB, err := client.FlatFeed("flat", "eric")
-	if err != nil {
-		t.Fatal(err)
-	}
+	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
 
-	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
 	if err != nil {
 		t.Fail()
 	}
@@ -240,22 +172,12 @@ func TestNotificationFeedFollow(t *testing.T) {
 }
 
 func TestNotificationFeedFollowKeepingHistory(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
 
-	feedA, err := client.NotificationFeed("notification", "bob")
-	if err != nil {
-		t.Fatal(err)
-	}
+	feedA := getNotificationFeed(client)
+	feedB := getFlatFeed(client)
 
-	feedB, err := client.FlatFeed("flat", "eric")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
+	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
 	if err != nil {
 		t.Fail()
 	}
@@ -268,15 +190,9 @@ func TestNotificationFeedFollowKeepingHistory(t *testing.T) {
 }
 
 func TestMarkAsSeen(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
 
-	feed, err := client.NotificationFeed("notification", "larry")
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getNotificationFeed(client)
 
 	feed.AddActivities([]*getstream.Activity{
 		{
@@ -286,16 +202,12 @@ func TestMarkAsSeen(t *testing.T) {
 		},
 	})
 
-	time.Sleep(time.Second * 2)
-
 	output, _ := feed.Activities(getstream.GetNotificationFeedInput{})
 	if output.Unseen == 0 {
 		t.Fail()
 	}
 
 	feed.MarkActivitiesAsSeenWithLimit(15)
-
-	time.Sleep(time.Second * 2)
 
 	output, _ = feed.Activities(getstream.GetNotificationFeedInput{})
 	if output.Unseen != 0 {
@@ -305,25 +217,17 @@ func TestMarkAsSeen(t *testing.T) {
 }
 
 func TestMarkAsRead(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
 
-	feed, err := client.NotificationFeed("notification", "larry")
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getNotificationFeed(client)
 
 	feed.AddActivities([]*getstream.Activity{
-		&getstream.Activity{
+		{
 			Actor:  "flat:larry",
 			Object: "notification:larry",
 			Verb:   "post",
 		},
 	})
-
-	time.Sleep(time.Second * 2)
 
 	output, _ := feed.Activities(getstream.GetNotificationFeedInput{})
 	if output.Unread == 0 {
@@ -331,13 +235,11 @@ func TestMarkAsRead(t *testing.T) {
 	}
 
 	for _, result := range output.Results {
-		err = feed.MarkActivitiesAsRead(result.Activities)
+		err := feed.MarkActivitiesAsRead(result.Activities)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
-
-	time.Sleep(time.Second * 2)
 
 	output, _ = feed.Activities(getstream.GetNotificationFeedInput{})
 	if output.Unread != 0 {

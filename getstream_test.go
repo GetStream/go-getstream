@@ -4,16 +4,21 @@ import (
 	"os"
 
 	getstream "github.com/GetStream/stream-go"
+	"testing"
 )
 
-func PreTestSetup() (*getstream.Client, error) {
-	return doTestSetup(&getstream.Config{
+func PreTestSetup(t *testing.T) *getstream.Client {
+	client, err := doTestSetup(&getstream.Config{
 		APIKey:     os.Getenv("STREAM_API_KEY"),
 		APISecret:  os.Getenv("STREAM_API_SECRET"),
 		AppID:      os.Getenv("STREAM_APP_ID"),
 		Location:   os.Getenv("STREAM_REGION"),
 		TimeoutInt: 1000,
 	})
+	if err != nil {
+		t.Fail()
+	}
+	return client
 }
 
 func doTestSetup(cfg *getstream.Config) (*getstream.Client, error) {

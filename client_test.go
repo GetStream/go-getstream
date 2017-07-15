@@ -346,10 +346,7 @@ func TestClientAbsoluteURL(t *testing.T) {
 }
 
 func TestAddActivityToMany(t *testing.T) {
-	client, err := PreTestSetup()
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := PreTestSetup(t)
 
 	feeds := []string{}
 

@@ -20,7 +20,7 @@ type Activity struct {
 
 	ForeignID string
 	Data      *json.RawMessage
-	MetaData  map[string]string
+	MetaData  map[string]interface{}
 
 	To       []FeedID
 	signedTo []string
@@ -71,11 +71,10 @@ func (a Activity) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON is the custom unmarshal function for Activities
-// It will be used by json.Unmarshal()
 func (a *Activity) UnmarshalJSON(b []byte) (err error) {
 
 	rawPayload := make(map[string]*json.RawMessage)
-	metadata := make(map[string]string)
+	metadata := make(map[string]interface{})
 
 	err = json.Unmarshal(b, &rawPayload)
 	if err != nil {
@@ -138,9 +137,9 @@ func (a *Activity) UnmarshalJSON(b []byte) (err error) {
 				}
 			}
 		} else {
-			var strValue string
-			json.Unmarshal(*value, &strValue)
-			metadata[key] = strValue
+			var v interface{}
+			json.Unmarshal(*value, &v)
+			metadata[key] = v
 		}
 	}
 

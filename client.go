@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"fmt"
 	"gopkg.in/LeisureLink/httpsig.v1"
 )
 
@@ -298,6 +299,10 @@ func (c *Client) request(f Feed, method string, path string, payload []byte, par
 	case resp.StatusCode/100 == 2: // SUCCESS
 		return body, nil
 	default:
+
+		//todo debug code
+		fmt.Println(string(body))
+
 		var respErr Error
 		err = json.Unmarshal(body, &respErr)
 		if err != nil {

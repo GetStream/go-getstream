@@ -56,9 +56,7 @@ func (a Activity) MarshalJSON() ([]byte, error) {
 		payload["foreign_id"] = a.ForeignID
 	}
 
-	if a.TimeStamp == nil {
-		payload["time"] = time.Now().Format("2006-01-02T15:04:05.999999")
-	} else {
+	if a.TimeStamp != nil {
 		payload["time"] = a.TimeStamp.Format("2006-01-02T15:04:05.999999")
 	}
 

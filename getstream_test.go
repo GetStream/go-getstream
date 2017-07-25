@@ -16,7 +16,7 @@ func PreTestSetup(t *testing.T) *getstream.Client {
 		TimeoutInt: 1000,
 	})
 	if err != nil {
-		t.Fail()
+		t.FailNow()
 	}
 	return client
 }

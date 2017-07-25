@@ -3,8 +3,9 @@ package getstream_test
 import (
 	"os"
 
-	getstream "github.com/GetStream/stream-go"
 	"testing"
+
+	getstream "github.com/GetStream/stream-go"
 )
 
 func PreTestSetup(t *testing.T) *getstream.Client {

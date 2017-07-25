@@ -3,11 +3,12 @@ package getstream_test
 import (
 	"testing"
 
-	getstream "github.com/GetStream/stream-go"
 	"math/rand"
 	"reflect"
 	"runtime/debug"
 	"time"
+
+	getstream "github.com/GetStream/stream-go"
 )
 
 var src = rand.NewSource(time.Now().UnixNano())

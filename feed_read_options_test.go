@@ -1,8 +1,9 @@
 package getstream_test
 
 import (
-	getstream "github.com/GetStream/stream-go"
 	"testing"
+
+	getstream "github.com/GetStream/stream-go"
 )
 
 func TestNewFeedReadOptions(t *testing.T) {

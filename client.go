@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"gopkg.in/LeisureLink/httpsig.v1"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
+
+	"gopkg.in/LeisureLink/httpsig.v1"
 )
 
 // Client is used to connect to getstream.io

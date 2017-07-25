@@ -8,3 +8,4 @@ examples/
 stream-go.iml
 test.sh
 projectFilesBackup
+secrets.*sh

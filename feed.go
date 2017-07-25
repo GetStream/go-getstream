@@ -38,6 +38,14 @@ type Feed interface {
 
 	GetFollowers(limit int, offset int) ([]FeedID, error)
 	GetFollowings(limit int, offset int) ([]FeedID, error)
+
+	ChangeActivityTo(activityId string, options ChangeActivityToOptions) error
+}
+
+type ChangeActivityToOptions struct {
+	Replace []FeedID `json:"replace"`
+	Add     []FeedID `json:"add"`
+	Delete  []FeedID `json:"delete"`
 }
 
 // A collection of common code between all feeds
@@ -307,4 +315,15 @@ func (f *baseFeed) Follow(target Feed) error {
 // CopyLimit is the maximum number of Activities to Copy from History
 func (f *baseFeed) FollowFeedWithCopyLimit(target Feed, copyLimit int) error {
 	return f.follow(target, &copyLimit)
+}
+
+func (f *baseFeed) ChangeActivityTo(activityId string, opts ChangeActivityToOptions) (err error) {
+	endpoint := fmt.Sprintf("feed_target/%s/%s/change_activity_to/%s/", f.FeedSlug, f.UserID, activityId)
+	payload, err := json.Marshal(opts)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Client.post(f, endpoint, payload, nil)
+	return err
 }

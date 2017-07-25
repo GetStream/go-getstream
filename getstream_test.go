@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	getstream "github.com/GetStream/stream-go"
+	"github.com/stretchr/testify/require"
 )
 
 func PreTestSetup(t *testing.T) *getstream.Client {
@@ -16,9 +17,7 @@ func PreTestSetup(t *testing.T) *getstream.Client {
 		Location:   os.Getenv("STREAM_REGION"),
 		TimeoutInt: 1000,
 	})
-	if err != nil {
-		t.FailNow()
-	}
+	require.NoError(t, err)
 	return client
 }
 

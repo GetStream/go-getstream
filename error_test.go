@@ -6,6 +6,7 @@ import (
 	"time"
 
 	getstream "github.com/GetStream/stream-go"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestError(t *testing.T) {
@@ -26,17 +27,11 @@ func TestError(t *testing.T) {
 		StatusCode:  400,
 	}
 
-	if getStreamError != testError {
-		t.Error(err)
-	}
+	assert.Equal(t, getStreamError, testError)
 
-	if getStreamError.Duration() != time.Millisecond*36 {
-		t.Error(err)
-	}
+	assert.Equal(t, getStreamError.Duration(), time.Millisecond*36)
 
-	if getStreamError.Error() != "an exception (36ms): some detail" {
-		t.Error(err)
-	}
+	assert.Equal(t, getStreamError.Error(), "an exception (36ms): some detail")
 }
 
 func TestErrorBadDuration(t *testing.T) {

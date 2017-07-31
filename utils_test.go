@@ -7,55 +7,136 @@ import (
 )
 
 func TestFeedSlug(t *testing.T) {
-	feedSlug, err := getstream.ValidateFeedSlug("foo")
-	if err != nil {
-		t.Error(err)
-	}
-	if feedSlug != "foo" {
-		t.Error("feedSlug not 'foo'")
+	var tests = []struct {
+		//given
+		description string
+		slug        string
+
+		//expected
+		validatedSlug string
+		errorMsg      string
+	}{
+		{
+			"Slug with word chars",
+			"foo",
+
+			"foo",
+			"",
+		},
+		{
+			"Slug with word chars and dashes",
+			"f_o_o",
+
+			"f_o_o",
+			"",
+		},
+		{
+			"Slug with invalid chars",
+			"f-o-o",
+
+			"",
+			"invalid feedSlug",
+		},
 	}
 
-	feedSlug, err = getstream.ValidateFeedSlug("f-o-o")
-	if err != nil {
-		t.Error(err)
-	}
-	if feedSlug != "f_o_o" {
-		t.Error("feedSlug not 'f_o_o'")
+	for _, test := range tests {
+		feedSlug, err := getstream.ValidateFeedSlug(test.slug)
+		if feedSlug != test.validatedSlug {
+			t.Errorf("Expected slug %v, got %v", test.validatedSlug, feedSlug)
+		}
+
+		if err != nil && err.Error() != test.errorMsg {
+			t.Errorf("Error %v does not match expected %v", test.errorMsg, err.Error())
+		}
 	}
 }
 
 func TestFeedID(t *testing.T) {
-	feedID, err := getstream.ValidateFeedID("123")
-	if err != nil {
-		t.Error(err)
-	}
-	if feedID != "123" {
-		t.Error("feedID not '123'")
+	var tests = []struct {
+		//given
+		description string
+		feedID      string
+
+		//expected
+		validatedFeedID string
+		errorMsg        string
+	}{
+		{
+			"Feed ID with word chars",
+			"123",
+
+			"123",
+			"",
+		},
+		{
+			"Feed ID word chars and dashes",
+			"1_2_3",
+
+			"1_2_3",
+			"",
+		},
+		{
+			"Feed ID with invalid chars",
+			"1-2-3",
+
+			"",
+			"invalid feedID",
+		},
 	}
 
-	feedID, err = getstream.ValidateFeedID("1-2-3")
-	if err != nil {
-		t.Error(err)
-	}
-	if feedID != "1_2_3" {
-		t.Error("feedID not '1_2_3'")
+	for _, test := range tests {
+		feedID, err := getstream.ValidateFeedID(test.feedID)
+		if feedID != test.validatedFeedID {
+			t.Errorf("Expected feedID %v, got %v", test.validatedFeedID, feedID)
+		}
+
+		if err != nil && err.Error() != test.errorMsg {
+			t.Errorf("Error %v does not match expected %v", test.errorMsg, err.Error())
+		}
 	}
 }
 
 func TestUserID(t *testing.T) {
-	userID, err := getstream.ValidateUserID("123")
-	if err != nil {
-		t.Error(err)
-	}
-	if userID != "123" {
-		t.Error("userID not '123'")
+	var tests = []struct {
+		//given
+		description string
+		userID      string
+
+		//expected
+		validatedUserID string
+		errorMsg        string
+	}{
+		{
+			"User ID with word chars",
+			"123",
+
+			"123",
+			"",
+		},
+		{
+			"User ID word chars and dashes",
+			"1-2-3",
+
+			"1-2-3",
+			"",
+		},
+		{
+			"User ID with invalid chars",
+			"123@",
+
+			"",
+			"invalid userID",
+		},
 	}
 
-	userID, err = getstream.ValidateUserID("1-2-3")
-	if err != nil {
-		t.Error(err)
-	}
-	if userID != "1_2_3" {
-		t.Error("userSlug not '1_2_3'")
+	for _, test := range tests {
+		userID, err := getstream.ValidateUserID(test.userID)
+		if userID != test.validatedUserID {
+			t.Errorf("Expected userID %v, got %v", test.validatedUserID, userID)
+		}
+
+		if err != nil && err.Error() != test.errorMsg {
+			t.Errorf("Error %v does not match expected %v", test.errorMsg, err.Error())
+		}
 	}
 }

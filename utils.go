@@ -3,18 +3,12 @@ package getstream
 import (
 	"errors"
 	"regexp"
-	"strings"
 )
 
 func ValidateFeedSlug(feedSlug string) (string, error) {
-	r, err := regexp.Compile(`^\w+$`)
-	if err != nil {
-		return "", err
-	}
+	validFeedSlug := regexp.MustCompile(`^\w+$`)
 
-	feedSlug = strings.Replace(feedSlug, "-", "_", -1)
-
-	if !r.MatchString(feedSlug) {
+	if !validFeedSlug.MatchString(feedSlug) {
 		return "", errors.New("invalid feedSlug")
 	}
 
@@ -22,14 +16,9 @@ func ValidateFeedSlug(feedSlug string) (string, error) {
 }
 
 func ValidateFeedID(feedID string) (string, error) {
-	r, err := regexp.Compile(`^\w+$`)
-	if err != nil {
-		return "", err
-	}
+	validFeedID := regexp.MustCompile(`^\w+$`)
 
-	feedID = strings.Replace(feedID, "-", "_", -1)
-
-	if !r.MatchString(feedID) {
+	if !validFeedID.MatchString(feedID) {
 		return "", errors.New("invalid feedID")
 	}
 
@@ -37,14 +26,9 @@ func ValidateFeedID(feedID string) (string, error) {
 }
 
 func ValidateUserID(userID string) (string, error) {
-	r, err := regexp.Compile(`^\w+$`)
-	if err != nil {
-		return "", err
-	}
+	validUserID := regexp.MustCompile(`^[\w-]+$`)
 
-	userID = strings.Replace(userID, "-", "_", -1)
-
-	if !r.MatchString(userID) {
+	if !validUserID.MatchString(userID) {
 		return "", errors.New("invalid userID")
 	}
 

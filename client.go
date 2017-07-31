@@ -56,18 +56,21 @@ func New(cfg *Config) (*Client, error) {
 	location := "api"
 	port := ""
 	secure := "s"
-	if cfg.Location != "" {
+	mainDomain := ".getstream.io"
+
+	if cfg.Location == "localhost" {
+		location = "localhost"
+		port = ":8000"
+		secure = ""
+		mainDomain = ""
+	} else if cfg.Location != "" {
 		location = cfg.Location + "-api"
 		if cfg.Location == "qa" {
 			secure = ""
 		}
-		if cfg.Location == "localhost" {
-			port = ":8000"
-			secure = ""
-		}
 	}
 
-	baseURL, err := url.Parse("http" + secure + "://" + location + ".getstream.io" + port + "/api/" + cfg.Version + "/")
+	baseURL, err := url.Parse("http" + secure + "://" + location + mainDomain + port + "/api/" + cfg.Version + "/")
 	if err != nil {
 		return nil, err
 	}

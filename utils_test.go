@@ -4,8 +4,6 @@ import (
 	"testing"
 
 	"math/rand"
-	"reflect"
-	"runtime/debug"
 	"time"
 
 	getstream "github.com/GetStream/stream-go"
@@ -36,13 +34,6 @@ func RandString(n int) string {
 	}
 
 	return string(b)
-}
-
-func assert(t *testing.T, exp, got interface{}, equal bool) {
-	if reflect.DeepEqual(exp, got) != equal {
-		debug.PrintStack()
-		t.Fatalf("Expecting '%v' got '%v'\n", exp, got)
-	}
 }
 
 func TestFeedSlug(t *testing.T) {

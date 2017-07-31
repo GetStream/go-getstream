@@ -56,7 +56,7 @@ func TestClientLocalhost(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if client.BaseURL.String() != "http://localhost-api.getstream.io:8000/api/v1.0/" {
+	if client.BaseURL.String() != "http://localhost:8000/api/v1.0/" {
 		t.Fatal("Location=localhost should be represented in non-SSL URL on port 8000, got", client.BaseURL.String())
 	}
 }
@@ -71,7 +71,7 @@ func TestClientToken(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if client.BaseURL.String() != "http://localhost-api.getstream.io:8000/api/v1.0/" {
+	if client.BaseURL.String() != "http://localhost:8000/api/v1.0/" {
 		t.Fatal("Location=localhost should be represented in non-SSL URL on port 8000, got", client.BaseURL.String())
 	}
 }

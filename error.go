@@ -11,9 +11,10 @@ type Error struct {
 	Code       int `json:"code"`
 	StatusCode int `json:"status_code"`
 
-	Detail      string `json:"detail"`
-	RawDuration string `json:"duration"`
-	Exception   string `json:"exception"`
+	Detail          string              `json:"detail"`
+	RawDuration     string              `json:"duration"`
+	Exception       string              `json:"exception"`
+	ExceptionFields map[string][]string `json:"exception_fields"`
 }
 
 var _ error = &Error{}

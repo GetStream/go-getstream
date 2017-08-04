@@ -25,17 +25,17 @@ var contextMatchers = []ContextMatcher{
 		auth:    FeedAuthentication,
 	},
 	{
-		re:      regexp.MustCompile("^feed/.+/.+/followers/$"),
+		re:      regexp.MustCompile("^feed/[^/]+/[^/]+/followers/$"),
 		context: ScopeContextFollower,
 		auth:    FeedAuthentication,
 	},
 	{
-		re:      regexp.MustCompile("^feed/.+/.+/follows/$"),
+		re:      regexp.MustCompile("^feed/[^/]+/[^/]+/follows/$"),
 		context: ScopeContextFollower,
 		auth:    FeedAuthentication,
 	},
 	{
-		re:      regexp.MustCompile("^feed/.+/.+/following/.+/$"),
+		re:      regexp.MustCompile("^feed/[^/]+/[^/]+/following/[^/]+/$"),
 		context: ScopeContextFollower,
 		auth:    FeedAuthentication,
 	},

@@ -18,13 +18,13 @@ var authenticators = map[AuthenticationMethod]Authenticator{
 }
 
 var scopeActions = map[string]ScopeAction{
-	http.MethodGet:     ScopeActionRead,
-	http.MethodOptions: ScopeActionRead,
-	http.MethodHead:    ScopeActionRead,
-	http.MethodPost:    ScopeActionWrite,
-	http.MethodPut:     ScopeActionWrite,
-	http.MethodPatch:   ScopeActionWrite,
-	http.MethodDelete:  ScopeActionDelete,
+	"GET":     ScopeActionRead,
+	"OPTIONS": ScopeActionRead,
+	"HEAD":    ScopeActionRead,
+	"POST":    ScopeActionWrite,
+	"PUT":     ScopeActionWrite,
+	"PATCH":   ScopeActionWrite,
+	"DELETE":  ScopeActionDelete,
 }
 
 type Authenticator interface {

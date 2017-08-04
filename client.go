@@ -212,17 +212,17 @@ func (c *Client) AbsoluteURL(path string) (*url.URL, error) {
 // get request helper
 func (c *Client) get(f Feed, path string, payload []byte, params map[string]string) ([]byte, error) {
 	// we force an empty body payload because GET requests cannot have a body with our API
-	return c.request(f, http.MethodGet, path, []byte{}, params)
+	return c.request(f, "GET", path, []byte{}, params)
 }
 
 // post request helper
 func (c *Client) post(f Feed, path string, payload []byte, params map[string]string) ([]byte, error) {
-	return c.request(f, http.MethodPost, path, payload, params)
+	return c.request(f, "POST", path, payload, params)
 }
 
 // delete request helper
 func (c *Client) del(f Feed, path string, payload []byte, params map[string]string) error {
-	_, err := c.request(f, http.MethodDelete, path, payload, params)
+	_, err := c.request(f, "DELETE", path, payload, params)
 	return err
 }
 

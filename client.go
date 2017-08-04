@@ -226,7 +226,7 @@ func (c *Client) del(f Feed, path string, payload []byte, params map[string]stri
 	return err
 }
 
-func (c *Client) getMatcher(path string) (ContextMatcher, error) {
+func (c *Client) getContextMatcher(path string) (ContextMatcher, error) {
 	for _, matcher := range contextMatchers {
 		if matcher.re.MatchString(path) {
 			return matcher, nil
@@ -264,7 +264,7 @@ func (c *Client) request(feed Feed, method string, path string, payload []byte, 
 
 	c.setBaseHeaders(req)
 
-	matcher, err := c.getMatcher(path)
+	matcher, err := c.getContextMatcher(path)
 	if err != nil {
 		return nil, err
 	}

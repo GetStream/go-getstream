@@ -40,16 +40,6 @@ var contextMatchers = []ContextMatcher{
 		auth:    FeedAuthentication,
 	},
 	{
-		re:      regexp.MustCompile("^feed/add_to_many/$"),
-		context: ScopeContextNoContext,
-		auth:    FeedAuthentication,
-	},
-	{
-		re:      regexp.MustCompile("^follow_many/$"),
-		context: ScopeContextNoContext,
-		auth:    FeedAuthentication,
-	},
-	{
 		re:      regexp.MustCompile("^feed/"),
 		context: ScopeContextFeed,
 		auth:    FeedAuthentication,

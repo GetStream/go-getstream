@@ -8,18 +8,19 @@ import (
 	getstream "github.com/GetStream/stream-go"
 )
 
-func getFlatFeed(client *getstream.Client) (*getstream.FlatFeed, error) {
-	return client.FlatFeed("flat", RandString(8))
+func getFlatFeed(t *testing.T, client *getstream.Client) *getstream.FlatFeed {
+	feed, err := client.FlatFeed("flat", RandString(8))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return feed
 }
 
 func TestExampleFlatFeedAddActivity(t *testing.T) {
 	client := PreTestSetup(t)
-	feed, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getFlatFeed(t, client)
 
-	_, err = feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: RandString(8),
 		Object:    "flat:eric",
@@ -32,10 +33,7 @@ func TestExampleFlatFeedAddActivity(t *testing.T) {
 
 func TestFlatFeedAddActivity(t *testing.T) {
 	client := PreTestSetup(t)
-	feed, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getFlatFeed(t, client)
 
 	fid := RandString(8)
 	activity, err := feed.AddActivity(&getstream.Activity{
@@ -56,22 +54,12 @@ func TestFlatFeedAddActivity(t *testing.T) {
 
 func TestFlatFeedAddActivityWithTo(t *testing.T) {
 	client := PreTestSetup(t)
-	feed, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	feedTo, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
-	feedToB, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getFlatFeed(t, client)
+	feedTo := getFlatFeed(t, client)
+	feedToB := getFlatFeed(t, client)
 
 	fid := RandString(8)
-	_, err = feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: fid,
 		Object:    "flat:eric",
@@ -85,10 +73,7 @@ func TestFlatFeedAddActivityWithTo(t *testing.T) {
 
 func TestFlatFeedUUID(t *testing.T) {
 	client := PreTestSetup(t)
-	feed, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getFlatFeed(t, client)
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
@@ -109,10 +94,7 @@ func TestFlatFeedUUID(t *testing.T) {
 
 func TestFlatFeedRemoveActivity(t *testing.T) {
 	client := PreTestSetup(t)
-	feed, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getFlatFeed(t, client)
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:   "post",
@@ -132,10 +114,7 @@ func TestFlatFeedRemoveActivity(t *testing.T) {
 
 func TestFlatFeedRemoveByForeignIDActivity(t *testing.T) {
 	client := PreTestSetup(t)
-	feed, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getFlatFeed(t, client)
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
@@ -160,12 +139,9 @@ func TestFlatFeedRemoveByForeignIDActivity(t *testing.T) {
 
 func TestFlatFeedGetActivities(t *testing.T) {
 	client := PreTestSetup(t)
-	feed, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getFlatFeed(t, client)
 
-	_, err = feed.AddActivity(&getstream.Activity{
+	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
 		ForeignID: RandString(8),
 		Object:    "flat:eric",
@@ -188,12 +164,9 @@ func TestFlatFeedGetActivities(t *testing.T) {
 
 func TestFlatFeedAddActivities(t *testing.T) {
 	client := PreTestSetup(t)
-	feed, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feed := getFlatFeed(t, client)
 
-	_, err = feed.AddActivities([]*getstream.Activity{
+	_, err := feed.AddActivities([]*getstream.Activity{
 		{
 			Verb:      "post",
 			ForeignID: RandString(8),
@@ -215,14 +188,8 @@ func TestFlatFeedAddActivities(t *testing.T) {
 func TestFlatFeedFollow(t *testing.T) {
 	client := PreTestSetup(t)
 
-	feedA, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
-	feedB, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feedA := getFlatFeed(t, client)
+	feedB := getFlatFeed(t, client)
 
 	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
 		t.Fatal(err)
@@ -250,20 +217,11 @@ func TestFlatFeedFollow(t *testing.T) {
 func TestFlatFeedFollowingFollowers(t *testing.T) {
 	client := PreTestSetup(t)
 
-	feedA, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
-	feedB, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
-	feedC, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feedA := getFlatFeed(t, client)
+	feedB := getFlatFeed(t, client)
+	feedC := getFlatFeed(t, client)
 
-	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
+	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -288,16 +246,10 @@ func TestFlatFeedFollowingFollowers(t *testing.T) {
 func TestFlatFeedUnFollow(t *testing.T) {
 	client := PreTestSetup(t)
 
-	feedA, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
-	feedB, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feedA := getFlatFeed(t, client)
+	feedB := getFlatFeed(t, client)
 
-	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
+	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -312,16 +264,10 @@ func TestFlatFeedUnFollow(t *testing.T) {
 func TestFlatFeedUnFollowKeepingHistory(t *testing.T) {
 	client := PreTestSetup(t)
 
-	feedA, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
-	feedB, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feedA := getFlatFeed(t, client)
+	feedB := getFlatFeed(t, client)
 
-	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
+	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
 	if err != nil {
 		t.Fatal(err)
 	}

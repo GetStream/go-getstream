@@ -155,10 +155,7 @@ func TestAggregatedFeedAddActivities(t *testing.T) {
 func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 	client := PreTestSetup(t)
 	feedA := getAggregatedFeed(client)
-	feedB, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feedB := getFlatFeed(t, client)
 
 	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
 		t.Fatal(err)
@@ -192,10 +189,7 @@ func TestAggregatedFeedFollowKeepingHistory(t *testing.T) {
 	client := PreTestSetup(t)
 
 	feedA := getAggregatedFeed(client)
-	feedB, err := getFlatFeed(client)
-	if err != nil {
-		t.Fatal(err)
-	}
+	feedB := getFlatFeed(t, client)
 
 	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
 		t.Fatal(err)

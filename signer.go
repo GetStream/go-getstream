@@ -4,8 +4,10 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
+	"net/http"
 	"strings"
 
+	httpsig "gopkg.in/LeisureLink/httpsig.v1"
 	"gopkg.in/dgrijalva/jwt-go.v3"
 )
 
@@ -13,6 +15,7 @@ import (
 
 // Signer is responsible for generating Tokens
 type Signer struct {
+	Key    string
 	Secret string
 }
 
@@ -28,7 +31,7 @@ func (s Signer) UrlSafe(src string) string {
 	return src
 }
 
-// generateToken will use the Secret of the signer and the message passed as an argument to generate a Token
+// generateToken will use the secret of the signer and the message passed as an argument to generate a Token
 func (s Signer) GenerateToken(message string) string {
 	hash := sha1.New()
 	hash.Write([]byte(s.Secret))
@@ -39,60 +42,37 @@ func (s Signer) GenerateToken(message string) string {
 	return s.UrlSafe(digest)
 }
 
-// GenerateFeedScopeToken returns a jwt
-func (s Signer) GenerateFeedScopeToken(context ScopeContext, action ScopeAction, feedIDWithoutColon string) (string, error) {
-
-	claims := jwt.MapClaims{
-		"resource": context.Value(),
-		"action":   action.Value(),
-		// "aud":
-		// "exp": time.Now().UTC().Add(time.Hour * 1),
-		// "jti": uuid.New(),
-		// "iat": time.Now(),
-		// "iss":
-		// "nbf": time.Now().Unix(),
-		// "sub":
-	}
-
-	if feedIDWithoutColon != "" {
-		claims["feed_id"] = feedIDWithoutColon
-	} else {
-		claims["feed_id"] = "*"
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString([]byte(s.Secret))
+func (s Signer) SignHTTP(request *http.Request) error {
+	signer, err := httpsig.NewRequestSigner(s.Key, s.Secret, "hmac-sha256")
 	if err != nil {
-		return "", err
+		return err
 	}
-
-	return tokenString, nil
+	return signer.SignRequest(request, []string{}, nil)
 }
 
-// GenerateUserScopeToken returns a jwt
-func (s Signer) GenerateUserScopeToken(context ScopeContext, action ScopeAction, userID string) (string, error) {
+func (s Signer) SignJWT(request *http.Request, context ScopeContext, action ScopeAction, feedID string) error {
+	token, err := s.GenerateJWT(context, action, feedID)
+	if err != nil {
+		return err
+	}
+	request.Header.Set("Stream-Auth-Type", "jwt")
+	request.Header.Set("Authorization", token)
+	return nil
+}
+
+// GenerateFeedScopeToken returns a jwt
+func (s Signer) GenerateJWT(context ScopeContext, action ScopeAction, feedID string) (string, error) {
+	if feedID == "" {
+		feedID = "*"
+	}
 
 	claims := jwt.MapClaims{
 		"resource": context.Value(),
 		"action":   action.Value(),
-		// "aud":
-		// "exp": time.Now().UTC().Add(time.Hour * 1),
-		// "jti": uuid.New(),
-		// "iat": time.Now(),
-		// "iss":
-		// "nbf": time.Now().Unix(),
-		// "sub":
-	}
-
-	if userID != "" {
-		claims["user_id"] = userID
+		"feed_id":  feedID,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString([]byte(s.Secret))
 	if err != nil {
 		return "", err

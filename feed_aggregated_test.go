@@ -155,11 +155,13 @@ func TestAggregatedFeedAddActivities(t *testing.T) {
 func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 	client := PreTestSetup(t)
 	feedA := getAggregatedFeed(client)
-	feedB := getFlatFeed(client)
-
-	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
+	feedB, err := getFlatFeed(client)
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
+	}
+
+	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
+		t.Fatal(err)
 	}
 
 	// get feedB's followers, ensure feedA is there
@@ -180,9 +182,8 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 		t.Error("Eric's FeedB is not a follower of FeedA")
 	}
 
-	err = feedA.Unfollow(feedB)
-	if err != nil {
-		t.Fail()
+	if err := feedA.Unfollow(feedB); err != nil {
+		t.Fatal(err)
 	}
 
 }
@@ -191,16 +192,17 @@ func TestAggregatedFeedFollowKeepingHistory(t *testing.T) {
 	client := PreTestSetup(t)
 
 	feedA := getAggregatedFeed(client)
-	feedB := getFlatFeed(client)
-
-	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
+	feedB, err := getFlatFeed(client)
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 
-	err = feedA.UnfollowKeepingHistory(feedB)
-	if err != nil {
-		t.Fail()
+	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := feedA.UnfollowKeepingHistory(feedB); err != nil {
+		t.Fatal(err)
 	}
 
 }

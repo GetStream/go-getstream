@@ -38,89 +38,49 @@ func TestFeedScopeToken(t *testing.T) {
 		AppID:     "123456",
 		Location:  "us-east"})
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 		return
 	}
 
 	feed, err := client.FlatFeed("flat", "bob")
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 
-	_, err = client.Signer.GenerateFeedScopeToken(
+	_, err = client.Signer.GenerateJWT(
 		getstream.ScopeContextFeed,
 		getstream.ScopeActionRead,
 		feed.FeedIDWithoutColon())
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 
-	_, err = client.Signer.GenerateFeedScopeToken(
+	_, err = client.Signer.GenerateJWT(
 		getstream.ScopeContextActivities,
 		getstream.ScopeActionWrite,
 		feed.FeedIDWithoutColon())
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 
-	_, err = client.Signer.GenerateFeedScopeToken(
+	_, err = client.Signer.GenerateJWT(
 		getstream.ScopeContextFollower,
 		getstream.ScopeActionDelete,
 		feed.FeedIDWithoutColon())
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 
-	_, err = client.Signer.GenerateFeedScopeToken(
+	_, err = client.Signer.GenerateJWT(
 		getstream.ScopeContextAll,
 		getstream.ScopeActionAll,
 		feed.FeedIDWithoutColon())
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 
-	_, err = client.Signer.GenerateFeedScopeToken(getstream.ScopeContextFeed, getstream.ScopeActionRead, "")
+	_, err = client.Signer.GenerateJWT(getstream.ScopeContextFeed, getstream.ScopeActionRead, "")
 	if err != nil {
-		t.Fail()
-	}
-}
-
-func TestUserScopeToken(t *testing.T) {
-
-	client, err := getstream.New(&getstream.Config{
-		APIKey:    "a_key",
-		APISecret: "tfq2sdqpj9g446sbv653x3aqmgn33hsn8uzdc9jpskaw8mj6vsnhzswuwptuj9su",
-		AppID:     "123456",
-		Location:  "us-east"})
-	if err != nil {
-		t.Fail()
-		return
-	}
-
-	user := "bob"
-
-	_, err = client.Signer.GenerateUserScopeToken(getstream.ScopeContextFeed, getstream.ScopeActionRead, user)
-	if err != nil {
-		t.Fail()
-	}
-
-	_, err = client.Signer.GenerateUserScopeToken(getstream.ScopeContextActivities, getstream.ScopeActionWrite, user)
-	if err != nil {
-		t.Fail()
-	}
-
-	_, err = client.Signer.GenerateUserScopeToken(getstream.ScopeContextFollower, getstream.ScopeActionDelete, user)
-	if err != nil {
-		t.Fail()
-	}
-
-	_, err = client.Signer.GenerateUserScopeToken(getstream.ScopeContextAll, getstream.ScopeActionAll, user)
-	if err != nil {
-		t.Fail()
-	}
-
-	_, err = client.Signer.GenerateUserScopeToken(getstream.ScopeContextFeed, getstream.ScopeActionRead, "")
-	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 }

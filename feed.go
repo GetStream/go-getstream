@@ -253,7 +253,7 @@ func (f *baseFeed) GetFollowings(limit int, offset int) ([]FeedID, error) {
 		outputFeeds []FeedID
 	)
 
-	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/"
+	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "follows" + "/"
 
 	params := map[string]string{
 		"limit":  strconv.Itoa(limit),
@@ -276,7 +276,7 @@ func (f *baseFeed) GetFollowings(limit int, offset int) ([]FeedID, error) {
 }
 
 func (f *baseFeed) follow(target Feed, copyLimit *int) error {
-	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/"
+	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "follows" + "/"
 
 	input := struct {
 		Target            string `json:"target"`

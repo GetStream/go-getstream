@@ -9,3 +9,6 @@ stream-go.iml
 test.sh
 projectFilesBackup
 secrets.*sh
+
+.virtualgo
+.vscode/

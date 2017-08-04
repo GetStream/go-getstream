@@ -156,17 +156,14 @@ func TestNotificationFeedFollow(t *testing.T) {
 	client := PreTestSetup(t)
 
 	feedA := getNotificationFeed(client)
-	feedB := getFlatFeed(client)
+	feedB := getFlatFeed(t, client)
 
-	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
-
-	if err != nil {
-		t.Fail()
+	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
+		t.Fatal(err)
 	}
 
-	err = feedA.Unfollow(feedB)
-	if err != nil {
-		t.Fail()
+	if err := feedA.Unfollow(feedB); err != nil {
+		t.Fatal(err)
 	}
 
 }
@@ -175,16 +172,16 @@ func TestNotificationFeedFollowKeepingHistory(t *testing.T) {
 	client := PreTestSetup(t)
 
 	feedA := getNotificationFeed(client)
-	feedB := getFlatFeed(client)
+	feedB := getFlatFeed(t, client)
 
 	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 
 	err = feedA.UnfollowKeepingHistory(feedB)
 	if err != nil {
-		t.Fail()
+		t.Fatal(err)
 	}
 
 }

@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
-
-	"gopkg.in/LeisureLink/httpsig.v1"
 )
 
 // Client is used to connect to getstream.io
@@ -76,19 +75,20 @@ func New(cfg *Config) (*Client, error) {
 	}
 	cfg.SetBaseURL(baseURL)
 
-	var signer *Signer
+	var secret string
 	if cfg.Token != "" {
 		// build the Signature mechanism based on a Token value passed to the client setup
 		cfg.SetAPISecret("")
-		signer = &Signer{
-			Secret: cfg.Token,
-		}
+		secret = cfg.Token
 	} else {
 		// build the Signature based on the API Secret
 		cfg.SetToken("")
-		signer = &Signer{
-			Secret: cfg.APISecret,
-		}
+		secret = cfg.APISecret
+	}
+
+	signer := &Signer{
+		Key:    cfg.APIKey,
+		Secret: secret,
 	}
 
 	client := &Client{
@@ -226,8 +226,17 @@ func (c *Client) del(f Feed, path string, payload []byte, params map[string]stri
 	return err
 }
 
+func (c *Client) getContextMatcher(path string) (ContextMatcher, error) {
+	for _, matcher := range contextMatchers {
+		if matcher.re.MatchString(path) {
+			return matcher, nil
+		}
+	}
+	return ContextMatcher{}, fmt.Errorf("invalid request path")
+}
+
 // request helper
-func (c *Client) request(f Feed, method string, path string, payload []byte, params map[string]string) ([]byte, error) {
+func (c *Client) request(feed Feed, method string, path string, payload []byte, params map[string]string) ([]byte, error) {
 	var requestBody io.Reader
 
 	apiUrl, err := url.Parse(path)
@@ -248,39 +257,18 @@ func (c *Client) request(f Feed, method string, path string, payload []byte, par
 		requestBody = bytes.NewBuffer(payload)
 	}
 
-	// create a new http request
 	req, err := http.NewRequest(method, apiUrl.String(), requestBody)
 	if err != nil {
 		return nil, err
 	}
 
-	// set the Auth headers for the http request
 	c.setBaseHeaders(req)
 
-	auth := ""
-	sig := ""
-	switch {
-	case path == "follow_many/": // one feed follows many feeds
-		auth = "app"
-		sig = "sig"
-	case path == "activities/": // batch activities methods
-		// feed auth
-		auth = "feed"
-		sig = "jwt"
-	case path == "feed/add_to_many/": // add activity to many feeds
-		// application auth
-		auth = "app"
-		sig = "sig"
-	case path[:5] == "feed": // add activity to many feeds
-		// feed auth
-		auth = "feed"
-		sig = "jwt"
-	default: // everything else sig/httpsig and feed auth
-		auth = "feed"
-		sig = "sig"
+	matcher, err := c.getContextMatcher(path)
+	if err != nil {
+		return nil, err
 	}
-
-	c.setAuthSigAndHeaders(req, f, auth, sig, path)
+	c.setAuthSigAndHeaders(req, feed, path, matcher)
 
 	// perform the http request
 	resp, err := c.HTTP.Do(req)
@@ -340,39 +328,12 @@ func (c *Client) setBaseHeaders(request *http.Request) {
 	request.Header.Set("Date", t.Format("Mon, 2 Jan 2006 15:04:05 MST"))
 }
 
-func (c *Client) setAuthSigAndHeaders(request *http.Request, f Feed, auth string, sig string, path string) error {
-	if sig == "jwt" {
-		request.Header.Set("stream-auth-type", "jwt")
-		if f == nil {
-			request.Header.Set("Authorization", c.Config.Token)
-		} else {
-			if path == "activities/" {
-				token, err := c.Signer.GenerateFeedScopeToken(ScopeContextActivities, ScopeActionWrite, "*")
-				if err != nil {
-					return err
-				}
-				request.Header.Set("Authorization", token)
-			} else {
-				request.Header.Set("Authorization", f.Token())
-			}
-		}
-		return nil
+func (c *Client) setAuthSigAndHeaders(request *http.Request, feed Feed, path string, matcher ContextMatcher) error {
+	authenticator, ok := authenticators[matcher.auth]
+	if !ok {
+		return fmt.Errorf("missing authentication method")
 	}
-
-	if sig == "sig" {
-		if auth == "feed" {
-			if f.Token() == "" {
-				f.GenerateToken(c.Signer)
-			}
-			request.Header.Set("Authorization", f.Signature())
-		} else if auth == "app" {
-			signer, _ := httpsig.NewRequestSigner(c.Config.APIKey, c.Config.APISecret, "hmac-sha256")
-			signer.SignRequest(request, []string{}, nil)
-		}
-		return nil
-	}
-
-	return errors.New("No API Secret or config/feed Token")
+	return authenticator.Authenticate(c.Signer, request, matcher.context, feed)
 }
 
 type PostFlatFeedFollowingManyInput struct {

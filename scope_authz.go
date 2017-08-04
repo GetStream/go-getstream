@@ -34,6 +34,7 @@ func (a ScopeAction) Value() string {
 type ScopeContext uint32
 
 const (
+	ScopeContextNoContext ScopeContext = 0
 	// ScopeContextActivities :  Activities Endpoint
 	ScopeContextActivities ScopeContext = 1
 	// ScopeContextFeed : Feed Endpoint

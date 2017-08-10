@@ -2,6 +2,7 @@ package getstream_test
 
 import (
 	"encoding/json"
+	"log"
 	"testing"
 	"time"
 
@@ -398,23 +399,22 @@ func TestScore(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			out, err := feed.Activities(tc.opts)
-			if tc.shouldError && err == nil {
-				t.Fatal("expected error, got nil")
+		log.Println(tc.name) // this should be t.Run, but it's not supported on older versions of Go
+		out, err := feed.Activities(tc.opts)
+		if tc.shouldError && err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !tc.shouldError && err != nil {
+			t.Fatalf("expected no errors, got %s", err)
+			if len(out.Activities) != 1 {
+				t.Fatalf("expected to have returned 1 activity, returned %d", len(out.Activities))
 			}
-			if !tc.shouldError && err != nil {
-				t.Fatalf("expected no errors, got %s", err)
-				if len(out.Activities) != 1 {
-					t.Fatalf("expected to have returned 1 activity, returned %d", len(out.Activities))
-				}
-				if tc.expectedScore && out.Activities[0].Score == nil {
-					t.Fatalf("expected score, got nil")
-				}
-				if !tc.expectedScore && out.Activities[0].Score != nil {
-					t.Fatalf("expected nil score, got %f", *out.Activities[0].Score)
-				}
+			if tc.expectedScore && out.Activities[0].Score == nil {
+				t.Fatalf("expected score, got nil")
 			}
-		})
+			if !tc.expectedScore && out.Activities[0].Score != nil {
+				t.Fatalf("expected nil score, got %f", *out.Activities[0].Score)
+			}
+		}
 	}
 }

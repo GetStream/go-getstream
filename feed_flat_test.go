@@ -357,3 +357,64 @@ func TestFlatActivityMetaData(t *testing.T) {
 		t.Error(string(*activity.Data), string(*resultActivity.Data))
 	}
 }
+
+func TestScore(t *testing.T) {
+	client := PreTestSetup(t)
+	feed := getFlatFeed(t, client)
+
+	activity := &getstream.Activity{
+		Actor:  "flat:john",
+		Verb:   "post",
+		Object: "flat:eric",
+	}
+	_, err := feed.AddActivity(activity)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testCases := []struct {
+		name          string
+		opts          getstream.FeedReadOptions
+		shouldError   bool
+		expectedScore bool
+	}{
+		{
+			name:          "when ranking is not requested",
+			shouldError:   false,
+			opts:          getstream.NewFeedReadOptions(),
+			expectedScore: false,
+		},
+		{
+			name:        "when ranking is not configured",
+			shouldError: true,
+			opts:        getstream.NewFeedReadOptions().AddRanking("unknown"),
+		},
+		{
+			name:          "when ranking is configured",
+			shouldError:   false,
+			opts:          getstream.NewFeedReadOptions().AddRanking("popularity"),
+			expectedScore: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			out, err := feed.Activities(tc.opts)
+			if tc.shouldError && err == nil {
+				t.Fatal("expected error, got nil")
+			}
+			if !tc.shouldError && err != nil {
+				t.Fatalf("expected no errors, got %s", err)
+				if len(out.Activities) != 1 {
+					t.Fatalf("expected to have returned 1 activity, returned %d", len(out.Activities))
+				}
+				if tc.expectedScore && out.Activities[0].Score == nil {
+					t.Fatalf("expected score, got nil")
+				}
+				if !tc.expectedScore && out.Activities[0].Score != nil {
+					t.Fatalf("expected nil score, got %f", *out.Activities[0].Score)
+				}
+			}
+		})
+	}
+}

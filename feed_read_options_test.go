@@ -32,3 +32,9 @@ func TestNewFeedReadOptionsIdLt(t *testing.T) {
 	params := opts.Params()
 	assert.Equal(t, params, map[string]string{"id_lt": "lt", "id_lte": "lte"})
 }
+
+func TestNewFeedReadOptionsRanking(t *testing.T) {
+	opts := getstream.NewFeedReadOptions().AddRanking("test")
+	params := opts.Params()
+	assert.Equal(t, params, map[string]string{"ranking": "test"})
+}

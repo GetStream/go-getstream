@@ -48,6 +48,12 @@ func (i FeedReadOptions) AddIdLt(idLT string) FeedReadOptions {
 	return i
 }
 
+func (i FeedReadOptions) AddRanking(ranking string) FeedReadOptions {
+	i.ranking = ranking
+	return i
+}
+
+// TODO this function (and whole struct) seriously requires a refactor
 func (i FeedReadOptions) Params() (params map[string]string) {
 	params = make(map[string]string)
 
@@ -68,6 +74,9 @@ func (i FeedReadOptions) Params() (params map[string]string) {
 	}
 	if i.idLt != "" {
 		params["id_lt"] = i.idLt
+	}
+	if i.ranking != "" {
+		params["ranking"] = i.ranking
 	}
 	return params
 }

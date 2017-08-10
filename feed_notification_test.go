@@ -156,7 +156,7 @@ func TestNotificationFeedFollow(t *testing.T) {
 	client := PreTestSetup(t)
 
 	feedA := getNotificationFeed(client)
-	feedB := getFlatFeed(t, client)
+	feedB := getFlatFeed(t, client, flatFeedName)
 
 	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
 		t.Fatal(err)
@@ -172,7 +172,7 @@ func TestNotificationFeedFollowKeepingHistory(t *testing.T) {
 	client := PreTestSetup(t)
 
 	feedA := getNotificationFeed(client)
-	feedB := getFlatFeed(t, client)
+	feedB := getFlatFeed(t, client, flatFeedName)
 
 	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
 	if err != nil {

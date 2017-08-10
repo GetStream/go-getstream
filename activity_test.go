@@ -1,7 +1,9 @@
 package getstream_test
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"testing"
 
 	getstream "github.com/GetStream/stream-go"
@@ -114,5 +116,42 @@ func TestActivityUnmarshallBadPayloadTo(t *testing.T) {
 	}
 	if activity.To != nil {
 		t.Fatal("To payload was not a value feedslug:userid format, expected To to be nil afterward, got:", activity.To)
+	}
+}
+
+func TestActivityUnmarshalScore(t *testing.T) {
+	activity := &getstream.Activity{}
+
+	expected := 1.123
+	payload := []byte(fmt.Sprintf(`{ "score": %f }`, expected))
+
+	err := activity.UnmarshalJSON(payload)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if *activity.Score != expected {
+		t.Fatalf("expected %f, got %f", expected, *activity.Score)
+	}
+}
+
+func TestActivityMarshalScore(t *testing.T) {
+	expectedScore := 1.123
+	activity := &getstream.Activity{
+		Score: &expectedScore,
+	}
+
+	out, err := activity.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var dest map[string]interface{}
+	if err := json.Unmarshal(out, &dest); err != nil {
+		t.Fatal(err)
+	}
+
+	if score, ok := dest["score"].(float64); !ok || score != expectedScore {
+		t.Fatalf("expected score %f, got %f", expectedScore, score)
 	}
 }

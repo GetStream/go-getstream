@@ -16,6 +16,7 @@ type Activity struct {
 	Object    string
 	Target    string
 	Origin    FeedID
+	Score     *float64
 	TimeStamp *time.Time
 
 	ForeignID string
@@ -64,12 +65,16 @@ func (a Activity) MarshalJSON() ([]byte, error) {
 		payload["to"] = a.signedTo
 	}
 
+	if a.Score != nil {
+		payload["score"] = *a.Score
+	}
+
 	return json.Marshal(payload)
 
 }
 
 // UnmarshalJSON is the custom unmarshal function for Activities
-func (a *Activity) UnmarshalJSON(b []byte) (err error) {
+func (a *Activity) UnmarshalJSON(b []byte) (err error) { // TODO clean up marshaling and unmarshaling
 
 	rawPayload := make(map[string]*json.RawMessage)
 	metadata := make(map[string]interface{})
@@ -110,6 +115,10 @@ func (a *Activity) UnmarshalJSON(b []byte) (err error) {
 			var strValue string
 			json.Unmarshal(*value, &strValue)
 			a.Origin = FeedID(strValue)
+		} else if lowerKey == "score" {
+			var score float64
+			json.Unmarshal(*value, &score)
+			a.Score = &score
 		} else if lowerKey == "target" {
 			var strValue string
 			json.Unmarshal(*value, &strValue)

@@ -2,18 +2,32 @@ package getstream_test
 
 import (
 	"encoding/json"
+	"log"
 	"testing"
 	"time"
 
 	getstream "github.com/GetStream/stream-go"
 )
 
-func getFlatFeed(t *testing.T, client *getstream.Client) *getstream.FlatFeed {
-	feed, err := client.FlatFeed("flat", RandString(8))
+const (
+	flatFeedName   = "flat"
+	rankedFeedName = "ranked"
+)
+
+func getFlatFeedByName(t *testing.T, client *getstream.Client, name string) *getstream.FlatFeed {
+	feed, err := client.FlatFeed(name, RandString(8))
 	if err != nil {
 		t.Fatal(err)
 	}
 	return feed
+}
+
+func getFlatFeed(t *testing.T, client *getstream.Client) *getstream.FlatFeed {
+	return getFlatFeedByName(t, client, flatFeedName)
+}
+
+func getRankedFeed(t *testing.T, client *getstream.Client) *getstream.FlatFeed {
+	return getFlatFeedByName(t, client, rankedFeedName)
 }
 
 func TestExampleFlatFeedAddActivity(t *testing.T) {
@@ -355,5 +369,65 @@ func TestFlatActivityMetaData(t *testing.T) {
 	}
 	if string(*resultActivity.Data) != string(*activity.Data) {
 		t.Error(string(*activity.Data), string(*resultActivity.Data))
+	}
+}
+
+func TestRankedFlatFeedScore(t *testing.T) {
+	client := PreTestSetup(t)
+	feed := getRankedFeed(t, client)
+
+	activity := &getstream.Activity{
+		Actor:  "flat:john",
+		Verb:   "post",
+		Object: "flat:eric",
+	}
+	_, err := feed.AddActivity(activity)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testCases := []struct {
+		name          string
+		opts          getstream.FeedReadOptions
+		shouldError   bool
+		expectedScore bool
+	}{
+		{
+			name:          "when ranking is not requested",
+			shouldError:   false,
+			opts:          getstream.NewFeedReadOptions(),
+			expectedScore: false,
+		},
+		{
+			name:        "when ranking is not configured",
+			shouldError: true,
+			opts:        getstream.NewFeedReadOptions().AddRanking("unknown"),
+		},
+		{
+			name:          "when ranking is configured",
+			shouldError:   false,
+			opts:          getstream.NewFeedReadOptions().AddRanking("popularity"),
+			expectedScore: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		log.Println(tc.name) // this should be t.Run, but it's not supported on older versions of Go
+		out, err := feed.Activities(tc.opts)
+		if tc.shouldError && err == nil {
+			t.Fatal("expected error, got nil")
+		}
+		if !tc.shouldError && err != nil {
+			t.Fatalf("expected no errors, got %s", err)
+			if len(out.Activities) != 1 {
+				t.Fatalf("expected to have returned 1 activity, returned %d", len(out.Activities))
+			}
+			if tc.expectedScore && out.Activities[0].Score == nil {
+				t.Fatalf("expected score, got nil")
+			}
+			if !tc.expectedScore && out.Activities[0].Score != nil {
+				t.Fatalf("expected nil score, got %f", *out.Activities[0].Score)
+			}
+		}
 	}
 }

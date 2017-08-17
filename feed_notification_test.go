@@ -123,7 +123,7 @@ func TestNotificationFeedActivities(t *testing.T) {
 		t.Error(err)
 	}
 
-	_, err = feed.Activities(getstream.NewFeedReadOptions())
+	_, err = feed.Activities(getstream.NewNotificationFeedReadOptions())
 	if err != nil {
 		t.Error(err)
 	}
@@ -199,50 +199,50 @@ func TestMarkAsSeen(t *testing.T) {
 		},
 	})
 
-	output, _ := feed.Activities(getstream.NewFeedReadOptions())
+	output, _ := feed.Activities(getstream.NewNotificationFeedReadOptions())
 	if output.Unseen == 0 {
 		t.Fail()
 	}
 
-	feed.MarkActivitiesAsSeenWithLimit(15)
+	feed.Activities(getstream.NewNotificationFeedReadOptions().MarkAllSeen())
 
-	output, _ = feed.Activities(getstream.NewFeedReadOptions())
+	output, _ = feed.Activities(getstream.NewNotificationFeedReadOptions())
 	if output.Unseen != 0 {
 		t.Fail()
 	}
 
 }
 
-func TestMarkAsRead(t *testing.T) {
-	client := PreTestSetup(t)
-
-	feed := getNotificationFeed(client)
-
-	feed.AddActivities([]*getstream.Activity{
-		{
-			Actor:  "flat:larry",
-			Object: "notification:larry",
-			Verb:   "post",
-		},
-	})
-
-	output, _ := feed.Activities(getstream.NewFeedReadOptions())
-	if output.Unread == 0 {
-		t.Fail()
-	}
-
-	for _, result := range output.Results {
-		err := feed.MarkActivitiesAsRead(result.Activities)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	output, _ = feed.Activities(getstream.NewFeedReadOptions())
-	if output.Unread != 0 {
-		t.Fail()
-	}
-}
+//func TestMarkAsRead(t *testing.T) {
+//	client := PreTestSetup(t)
+//
+//	feed := getNotificationFeed(client)
+//
+//	feed.AddActivities([]*getstream.Activity{
+//		{
+//			Actor:  "flat:larry",
+//			Object: "notification:larry",
+//			Verb:   "post",
+//		},
+//	})
+//
+//	output, _ := feed.Activities(getstream.NewNotificationFeedReadOptions())
+//	if output.Unread == 0 {
+//		t.Fail()
+//	}
+//
+//	for _, result := range output.Results {
+//		err := feed.MarkActivitiesAsRead(result.Activities)
+//		if err != nil {
+//			t.Fatal(err)
+//		}
+//	}
+//
+//	output, _ = feed.Activities(getstream.NewNotificationFeedReadOptions())
+//	if output.Unread != 0 {
+//		t.Fail()
+//	}
+//}
 
 func TestNotificationActivityMetaData(t *testing.T) {
 

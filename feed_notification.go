@@ -2,12 +2,44 @@ package getstream
 
 import (
 	"encoding/json"
-	"strconv"
-	"strings"
 )
 
 type NotificationFeed struct {
 	baseFeed
+}
+
+type NotificationFeedReadOptions struct {
+	FeedReadOptions
+	markAllSeen bool
+	markAllRead bool
+
+	markSeen []string
+	markRead []string
+}
+
+func NewNotificationFeedReadOptions() NotificationFeedReadOptions {
+	return NotificationFeedReadOptions{}
+}
+
+func (i NotificationFeedReadOptions) MarkAllSeen() NotificationFeedReadOptions {
+	i.markAllSeen = true
+	return i
+}
+
+func (i NotificationFeedReadOptions) MarkAllRead() NotificationFeedReadOptions {
+	i.markAllRead = true
+	return i
+}
+
+func (i NotificationFeedReadOptions) Params() (params map[string]string) {
+	params = i.FeedReadOptions.Params()
+	if i.markAllSeen {
+		params["mark_seen"] = "true"
+	}
+	if i.markAllRead {
+		params["mark_read"] = "true"
+	}
+	return params
 }
 
 // GetNotificationFeedOutput is the response from a NotificationFeed Activities Get Request
@@ -108,40 +140,8 @@ type getNotificationFeedOutputResult struct {
 	Verb          string      `json:"verb"`
 }
 
-// MarkActivitiesAsRead marks activities as read for this feed
-func (f *NotificationFeed) MarkActivitiesAsRead(activities []*Activity) error {
-
-	var ids []string
-	for _, activity := range activities {
-		ids = append(ids, activity.ID)
-	}
-
-	idStr := strings.Join(ids, ",")
-
-	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/"
-
-	_, err := f.Client.get(f, endpoint, nil, map[string]string{
-		"mark_read": idStr,
-	})
-
-	return err
-}
-
-// MarkActivitiesAsSeenWithLimit marks activities as seen for this feed
-func (f *NotificationFeed) MarkActivitiesAsSeenWithLimit(limit int) error {
-
-	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/"
-
-	_, err := f.Client.get(f, endpoint, nil, map[string]string{
-		"mark_seen": "true",
-		"limit":     strconv.Itoa(limit),
-	})
-
-	return err
-}
-
 // Activities returns a list of Activities for a NotificationFeedGroup
-func (f *NotificationFeed) Activities(input FeedReadOptions) (*GetNotificationFeedOutput, error) {
+func (f *NotificationFeed) Activities(input NotificationFeedReadOptions) (*GetNotificationFeedOutput, error) {
 	var (
 		payload []byte
 		err     error

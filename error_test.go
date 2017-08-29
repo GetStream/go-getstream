@@ -2,6 +2,7 @@ package getstream_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -20,32 +21,32 @@ func TestError(t *testing.T) {
 	}
 
 	testError := getstream.Error{
-		Code:        5,
-		Detail:      "some detail",
-		RawDuration: "36ms",
-		Exception:   "an exception",
-		StatusCode:  400,
+		Code:       5,
+		Detail:     "some detail",
+		Duration:   36 * time.Millisecond,
+		Exception:  "an exception",
+		StatusCode: 400,
 	}
 
 	assert.Equal(t, getStreamError, testError)
-
-	assert.Equal(t, getStreamError.Duration(), time.Millisecond*36)
-
+	assert.Equal(t, getStreamError.Duration, time.Millisecond*36)
 	assert.Equal(t, getStreamError.Error(), "an exception (36ms): some detail")
 }
 
 func TestErrorBadDuration(t *testing.T) {
+	var e getstream.Error
 
-	testError := getstream.Error{
-		Code:        5,
-		Detail:      "some detail",
-		RawDuration: "36blah",
-		Exception:   "an exception",
-		StatusCode:  400,
+	testCases := []struct {
+		duration string
+	}{
+		{duration: ""},
+		{duration: "asd"},
+		{duration: "123asd"},
 	}
 
-	if testError.Duration() != time.Duration(0) {
-		t.Fatal()
+	for _, tc := range testCases {
+		payload := fmt.Sprintf(`{"code":42, "duration":"%s"}`, tc.duration)
+		err := json.Unmarshal([]byte(payload), &e)
+		assert.NotNil(t, err)
 	}
-
 }

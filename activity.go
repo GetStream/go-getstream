@@ -144,9 +144,11 @@ func (a *Activity) UnmarshalJSON(b []byte) (err error) { // TODO clean up marsha
 				}
 			}
 		} else {
-			var v interface{}
-			json.Unmarshal(*value, &v)
-			metadata[key] = v
+			if key != "duration" { // TODO this is a placeholder fix until we refactor this whole method
+				var v interface{}
+				json.Unmarshal(*value, &v)
+				metadata[key] = v
+			}
 		}
 	}
 

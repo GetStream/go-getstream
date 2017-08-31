@@ -184,6 +184,23 @@ func (f *baseFeed) RemoveActivityByForeignID(foreignId string) error {
 	})
 }
 
+func (f *baseFeed) UpdateActivities(activities ...*Activity) error {
+	for _, a := range activities {
+		if err := a.checkUpdatability(); err != nil {
+			return err
+		}
+	}
+	payload, err := json.Marshal(UpdateActivitiesRequest{Activities: activities})
+	if err != nil {
+		return fmt.Errorf("cannot marshal payload: %s", err)
+	}
+	_, err = f.Client.post(nil, "activities/", payload, nil)
+	if err != nil {
+		return fmt.Errorf("cannot update activities: %s", err)
+	}
+	return nil
+}
+
 // Unfollow is used to Unfollow a target Feed
 func (f *baseFeed) Unfollow(target Feed) error {
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/" + target.FeedID().Value() + "/"

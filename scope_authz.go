@@ -17,13 +17,13 @@ const (
 // Value returns a string representation
 func (a ScopeAction) Value() string {
 	switch a {
-	case 1:
+	case ScopeActionRead:
 		return "read"
-	case 2:
+	case ScopeActionWrite:
 		return "write"
-	case 4:
+	case ScopeActionDelete:
 		return "delete"
-	case 8:
+	case ScopeActionAll:
 		return "*"
 	default:
 		return ""
@@ -48,13 +48,13 @@ const (
 // Value returns a string representation
 func (a ScopeContext) Value() string {
 	switch a {
-	case 1:
+	case ScopeContextActivities:
 		return "activities"
-	case 2:
+	case ScopeContextFeed:
 		return "feed"
-	case 4:
+	case ScopeContextFollower:
 		return "follower"
-	case 8:
+	case ScopeContextAll:
 		return "*"
 	default:
 		return ""

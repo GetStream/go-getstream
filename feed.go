@@ -194,7 +194,9 @@ func (f *baseFeed) UpdateActivities(activities ...*Activity) error {
 	if err != nil {
 		return fmt.Errorf("cannot marshal payload: %s", err)
 	}
-	_, err = f.Client.post(nil, "activities/", payload, nil)
+
+	endpoint := "activities/"
+	_, err = f.Client.post(nil, endpoint, payload, nil)
 	if err != nil {
 		return fmt.Errorf("cannot update activities: %s", err)
 	}

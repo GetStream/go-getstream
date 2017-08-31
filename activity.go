@@ -2,7 +2,6 @@ package getstream
 
 import (
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 )
@@ -30,16 +29,6 @@ type Activity struct {
 
 type UpdateActivitiesRequest struct {
 	Activities []*Activity `json:"activities"`
-}
-
-func (a Activity) checkUpdatability() error {
-	if a.ForeignID == "" {
-		return fmt.Errorf("foreignID is required for updating activity")
-	}
-	if a.TimeStamp == nil || a.TimeStamp.IsZero() {
-		return fmt.Errorf("an activity must have a time in order to be updated")
-	}
-	return nil
 }
 
 // MarshalJSON is the custom marshal function for Activities

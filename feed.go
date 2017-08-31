@@ -185,11 +185,6 @@ func (f *baseFeed) RemoveActivityByForeignID(foreignId string) error {
 }
 
 func (f *baseFeed) UpdateActivities(activities ...*Activity) error {
-	for _, a := range activities {
-		if err := a.checkUpdatability(); err != nil {
-			return err
-		}
-	}
 	payload, err := json.Marshal(UpdateActivitiesRequest{Activities: activities})
 	if err != nil {
 		return fmt.Errorf("cannot marshal payload: %s", err)

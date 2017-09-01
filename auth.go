@@ -49,5 +49,9 @@ func (a feedAuthenticator) Authenticate(signer *Signer, request *http.Request, c
 	if !ok {
 		return fmt.Errorf("missing action")
 	}
-	return signer.SignJWT(request, context, action, feed.FeedIDWithoutColon())
+	var feedID string
+	if feed != nil {
+		feedID = feed.FeedIDWithoutColon()
+	}
+	return signer.SignJWT(request, context, action, feedID)
 }

@@ -6,16 +6,19 @@ import (
 	"time"
 
 	getstream "github.com/GetStream/stream-go"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func getAggregatedFeed(client *getstream.Client) *getstream.AggregatedFeed {
-	f, _ := client.AggregatedFeed("aggregated", RandString(8))
+func getAggregatedFeed(t *testing.T, client *getstream.Client) *getstream.AggregatedFeed {
+	f, err := client.AggregatedFeed("aggregated", RandString(8))
+	require.NoError(t, err)
 	return f
 }
 
 func TestExampleAggregatedFeed_AddActivity(t *testing.T) {
 	client := PreTestSetup(t)
-	feed := getAggregatedFeed(client)
+	feed := getAggregatedFeed(t, client)
 
 	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
@@ -30,7 +33,7 @@ func TestExampleAggregatedFeed_AddActivity(t *testing.T) {
 
 func TestAggregatedFeedAddActivity(t *testing.T) {
 	client := PreTestSetup(t)
-	feed := getAggregatedFeed(client)
+	feed := getAggregatedFeed(t, client)
 
 	fid := RandString(8)
 	_, err := feed.AddActivity(&getstream.Activity{
@@ -46,8 +49,8 @@ func TestAggregatedFeedAddActivity(t *testing.T) {
 
 func TestAggregatedFeedAddActivityWithTo(t *testing.T) {
 	client := PreTestSetup(t)
-	feed := getAggregatedFeed(client)
-	toFeed := getAggregatedFeed(client)
+	feed := getAggregatedFeed(t, client)
+	toFeed := getAggregatedFeed(t, client)
 
 	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
@@ -63,7 +66,7 @@ func TestAggregatedFeedAddActivityWithTo(t *testing.T) {
 
 func TestAggregatedFeedRemoveActivity(t *testing.T) {
 	client := PreTestSetup(t)
-	feed := getAggregatedFeed(client)
+	feed := getAggregatedFeed(t, client)
 
 	activity, err := feed.AddActivity(&getstream.Activity{
 		Verb:   "post",
@@ -83,7 +86,7 @@ func TestAggregatedFeedRemoveActivity(t *testing.T) {
 
 func TestAggregatedFeedRemoveByForeignIDActivity(t *testing.T) {
 	client := PreTestSetup(t)
-	feed := getAggregatedFeed(client)
+	feed := getAggregatedFeed(t, client)
 
 	fid := RandString(8)
 	activity, err := feed.AddActivity(&getstream.Activity{
@@ -110,7 +113,7 @@ func TestAggregatedFeedRemoveByForeignIDActivity(t *testing.T) {
 
 func TestAggregatedFeedActivities(t *testing.T) {
 	client := PreTestSetup(t)
-	feed := getAggregatedFeed(client)
+	feed := getAggregatedFeed(t, client)
 
 	_, err := feed.AddActivity(&getstream.Activity{
 		Verb:      "post",
@@ -131,7 +134,7 @@ func TestAggregatedFeedActivities(t *testing.T) {
 
 func TestAggregatedFeedAddActivities(t *testing.T) {
 	client := PreTestSetup(t)
-	feed := getAggregatedFeed(client)
+	feed := getAggregatedFeed(t, client)
 
 	_, err := feed.AddActivities([]*getstream.Activity{
 		{
@@ -154,7 +157,7 @@ func TestAggregatedFeedAddActivities(t *testing.T) {
 
 func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 	client := PreTestSetup(t)
-	feedA := getAggregatedFeed(client)
+	feedA := getAggregatedFeed(t, client)
 	feedB := getFlatFeed(t, client)
 
 	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
@@ -188,7 +191,7 @@ func TestAggregatedFeedFollowUnfollow(t *testing.T) {
 func TestAggregatedFeedFollowKeepingHistory(t *testing.T) {
 	client := PreTestSetup(t)
 
-	feedA := getAggregatedFeed(client)
+	feedA := getAggregatedFeed(t, client)
 	feedB := getFlatFeed(t, client)
 
 	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
@@ -282,4 +285,22 @@ func TestAggregatedActivityMetaData(t *testing.T) {
 	if string(*resultActivity.Data) != string(*activity.Data) {
 		t.Error(string(*activity.Data), string(*resultActivity.Data))
 	}
+}
+
+func TestAggregatedFeedUpdateActivities(t *testing.T) {
+	client := PreTestSetup(t)
+	feed := getAggregatedFeed(t, client)
+
+	tt, _ := time.Parse("2006-01-02T15:04:05.999999", "2017-08-31T08:29:21.151279")
+	err := feed.UpdateActivities(
+		&getstream.Activity{
+			ForeignID: "bob:123",
+			TimeStamp: &tt,
+			Actor:     "bob",
+			Verb:      "verb",
+			Object:    "object",
+		},
+	)
+
+	assert.NoError(t, err)
 }

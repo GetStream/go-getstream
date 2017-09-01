@@ -27,6 +27,10 @@ type Activity struct {
 	signedTo []string
 }
 
+type UpdateActivitiesRequest struct {
+	Activities []*Activity `json:"activities"`
+}
+
 // MarshalJSON is the custom marshal function for Activities
 // It will be used by json.Marshal()
 func (a Activity) MarshalJSON() ([]byte, error) {

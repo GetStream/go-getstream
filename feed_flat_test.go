@@ -7,6 +7,8 @@ import (
 	"time"
 
 	getstream "github.com/GetStream/stream-go"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -16,9 +18,7 @@ const (
 
 func getFlatFeedByName(t *testing.T, client *getstream.Client, name string) *getstream.FlatFeed {
 	feed, err := client.FlatFeed(name, RandString(8))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	return feed
 }
 
@@ -430,4 +430,22 @@ func TestRankedFlatFeedScore(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestFlatFeedUpdateActivities(t *testing.T) {
+	client := PreTestSetup(t)
+	feed := getFlatFeed(t, client)
+
+	tt, _ := time.Parse("2006-01-02T15:04:05.999999", "2017-08-31T08:29:21.151279")
+	err := feed.UpdateActivities(
+		&getstream.Activity{
+			ForeignID: "bob:123",
+			TimeStamp: &tt,
+			Actor:     "bob",
+			Verb:      "verb",
+			Object:    "object",
+		},
+	)
+
+	assert.NoError(t, err)
 }

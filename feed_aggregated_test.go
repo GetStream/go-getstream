@@ -302,5 +302,5 @@ func TestAggregatedFeedUpdateActivities(t *testing.T) {
 		},
 	)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }

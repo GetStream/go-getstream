@@ -7,11 +7,12 @@ import (
 
 	getstream "github.com/GetStream/stream-go"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func getAggregatedFeed(t *testing.T, client *getstream.Client) *getstream.AggregatedFeed {
 	f, err := client.AggregatedFeed("aggregated", RandString(8))
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	return f
 }
 

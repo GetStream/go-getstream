@@ -8,6 +8,7 @@ import (
 
 	getstream "github.com/GetStream/stream-go"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -17,7 +18,7 @@ const (
 
 func getFlatFeedByName(t *testing.T, client *getstream.Client, name string) *getstream.FlatFeed {
 	feed, err := client.FlatFeed(name, RandString(8))
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	return feed
 }
 

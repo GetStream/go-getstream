@@ -242,6 +242,9 @@ func (f *baseFeed) GetFollowers(limit int, offset int) ([]FeedID, error) {
 	}
 
 	resultBytes, err := f.Client.get(f, endpoint, nil, params)
+	if err != nil {
+		return nil, err
+	}
 
 	output := &feedFollows{}
 	err = json.Unmarshal(resultBytes, output)
@@ -272,6 +275,9 @@ func (f *baseFeed) GetFollowings(limit int, offset int) ([]FeedID, error) {
 	}
 
 	resultBytes, err := f.Client.get(f, endpoint, nil, params)
+	if err != nil {
+		return nil, err
+	}
 
 	output := feedFollows{}
 	err = json.Unmarshal(resultBytes, &output)

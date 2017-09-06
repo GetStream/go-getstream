@@ -277,20 +277,18 @@ func TestFlatFeedUnFollow(t *testing.T) {
 
 func TestFlatFeedUnFollowKeepingHistory(t *testing.T) {
 	client := PreTestSetup(t)
-
 	feedA := getFlatFeed(t, client)
 	feedB := getFlatFeed(t, client)
 
-	err := feedA.FollowFeedWithCopyLimit(feedB, 20)
-	if err != nil {
-		t.Fatal(err)
-	}
+	prepareUnfollowKeepingHistory(t, feedA, feedB, func() {
+		_, err := feedA.Activities(getstream.NewFeedReadOptions())
+		require.NoError(t, err)
+	})
 
-	err = feedA.UnfollowKeepingHistory(feedB)
-	if err != nil {
-		t.Fatal(err)
-	}
+	out, err := feedA.Activities(getstream.NewFeedReadOptions())
+	require.NoError(t, err)
 
+	assert.Len(t, out.Activities, 10)
 }
 
 func TestFlatActivityMetaData(t *testing.T) {

@@ -194,14 +194,16 @@ func TestAggregatedFeedFollowKeepingHistory(t *testing.T) {
 	feedA := getAggregatedFeed(t, client)
 	feedB := getFlatFeed(t, client)
 
-	if err := feedA.FollowFeedWithCopyLimit(feedB, 20); err != nil {
-		t.Fatal(err)
-	}
+	prepareUnfollowKeepingHistory(t, feedA, feedB, func() {
+		_, err := feedA.Activities(getstream.NewFeedReadOptions())
+		require.NoError(t, err)
+	})
 
-	if err := feedA.UnfollowKeepingHistory(feedB); err != nil {
-		t.Fatal(err)
-	}
+	out, err := feedA.Activities(getstream.NewFeedReadOptions())
+	require.NoError(t, err)
 
+	require.Len(t, out.Results, 1)
+	assert.Len(t, out.Results[0].Activities, 10)
 }
 
 func TestAggregatedActivityMetaData(t *testing.T) {

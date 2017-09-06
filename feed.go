@@ -208,13 +208,10 @@ func (f *baseFeed) Unfollow(target Feed) error {
 // this means that Activities already visibile will remain
 func (f *baseFeed) UnfollowKeepingHistory(target Feed) error {
 	endpoint := "feed/" + f.FeedSlug + "/" + f.UserID + "/" + "following" + "/" + target.FeedID().Value() + "/"
-	payload, err := json.Marshal(map[string]string{
+	params := map[string]string{
 		"keep_history": "1",
-	})
-	if err != nil {
-		return err
 	}
-	return f.Client.del(f, endpoint, payload, nil)
+	return f.Client.del(f, endpoint, nil, params)
 }
 
 type feedFollows struct {

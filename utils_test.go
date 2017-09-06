@@ -1,12 +1,15 @@
 package getstream_test
 
 import (
+	"fmt"
 	"testing"
 
 	"math/rand"
 	"time"
 
 	getstream "github.com/GetStream/stream-go"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var src = rand.NewSource(time.Now().UnixNano())
@@ -88,4 +91,22 @@ func TestUserID(t *testing.T) {
 	if userID != "1_2_3" {
 		t.Error("userSlug not '1_2_3'")
 	}
+}
+
+func prepareUnfollowKeepingHistory(t *testing.T, feedA, feedB getstream.Feed, fn func()) {
+	activities := make([]*getstream.Activity, 10)
+	for i := range activities {
+		activities[i] = &getstream.Activity{Actor: "test", Verb: "like", Object: fmt.Sprintf("obj-%d", i)}
+	}
+	_, err := feedB.AddActivities(activities)
+	require.NoError(t, err)
+
+	err = feedA.FollowFeedWithCopyLimit(feedB, 20)
+	require.NoError(t, err)
+
+	fn()
+	time.Sleep(3 * time.Second)
+
+	err = feedA.UnfollowKeepingHistory(feedB)
+	assert.NoError(t, err)
 }

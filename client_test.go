@@ -2,8 +2,11 @@ package getstream_test
 
 import (
 	"testing"
+	"time"
 
 	getstream "github.com/GetStream/stream-go"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestClient(t *testing.T) {
@@ -384,4 +387,58 @@ func TestAddActivityToMany(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+}
+
+func prepareTestFollowMany(t *testing.T, client *getstream.Client) (*getstream.FlatFeed, []*getstream.PostFlatFeedFollowingManyInput, []*getstream.FlatFeed, *getstream.Activity) {
+	flat, err := client.FlatFeed("flat", RandString(10))
+	require.NoError(t, err)
+
+	activity := &getstream.Activity{Actor: "bob", Verb: "like", Object: "cake"}
+	activity, err = flat.AddActivity(activity)
+	require.NoError(t, err)
+
+	relations := make([]*getstream.PostFlatFeedFollowingManyInput, 20)
+	feeds := make([]*getstream.FlatFeed, 20)
+	for i := range relations {
+		feeds[i], err = client.FlatFeed("flat", RandString(10))
+		require.NoError(t, err)
+		relations[i] = client.PrepFollowFlatFeed(flat, feeds[i])
+	}
+	return flat, relations, feeds, activity
+}
+
+func TestFollowMany(t *testing.T) {
+	client := PreTestSetup(t)
+	flat, relations, feeds, activity := prepareTestFollowMany(t, client)
+
+	err := client.FollowMany(relations)
+	assert.NoError(t, err)
+	time.Sleep(2 * time.Second)
+
+	followers, err := flat.GetFollowers(100, 0)
+	require.NoError(t, err)
+	assert.Len(t, followers, len(relations))
+	time.Sleep(2 * time.Second)
+
+	out, err := feeds[0].Activities(getstream.NewFeedReadOptions())
+	require.NoError(t, err)
+	assert.Len(t, out.Activities, 1)
+	assert.Equal(t, out.Activities[0].ID, activity.ID)
+}
+
+func TestFollowManyCopyLimit(t *testing.T) {
+	client := PreTestSetup(t)
+	flat, relations, feeds, _ := prepareTestFollowMany(t, client)
+
+	err := client.FollowManyCopyLimit(relations, 0)
+	assert.NoError(t, err)
+	time.Sleep(2 * time.Second)
+
+	followers, err := flat.GetFollowers(100, 0)
+	require.NoError(t, err)
+	assert.Len(t, followers, len(relations))
+
+	out, err := feeds[0].Activities(getstream.NewFeedReadOptions())
+	require.NoError(t, err)
+	assert.Len(t, out.Activities, 0)
 }

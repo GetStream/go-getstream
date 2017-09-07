@@ -369,6 +369,29 @@ func (c *Client) PrepFollowNotificationFeed(targetFeed *FlatFeed, sourceFeed *No
 	}
 }
 
+// FollowMany creates multiple follow relationships at once.
+func (c *Client) FollowMany(relations []*PostFlatFeedFollowingManyInput) error {
+	return c.FollowManyCopyLimit(relations, -1)
+}
+
+// FollowMany creates multiple follow relationships at once, with the optional activity copy limit parameter passed as argument.
+// If activityCopyLimit is -1, the argument is not sent.
+func (c *Client) FollowManyCopyLimit(relations []*PostFlatFeedFollowingManyInput, activityCopyLimit int) error {
+	payload, err := json.Marshal(relations)
+	if err != nil {
+		return err
+	}
+	var params map[string]string
+	if activityCopyLimit != -1 {
+		params = map[string]string{
+			"activity_copy_limit": fmt.Sprintf("%d", activityCopyLimit),
+		}
+	}
+	endpoint := "follow_many/"
+	_, err = c.post(nil, endpoint, payload, params)
+	return err
+}
+
 type PostActivityToManyInput struct {
 	Activity Activity `json:"activity"`
 	FeedIDs  []string `json:"feeds"`

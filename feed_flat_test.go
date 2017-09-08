@@ -241,7 +241,11 @@ func TestFlatFeedFollowingsFilter(t *testing.T) {
 		followingIDs[i] = f.FeedID().Value()
 	}
 
-	following, err := feedA.GetFollowingsFiltered(5, 0, []string{followingIDs[2]})
+	following, err := feedA.GetFollowingsFiltered(10, 0, nil)
+	require.NoError(t, err)
+	assert.Len(t, following, 10)
+
+	following, err = feedA.GetFollowingsFiltered(5, 0, []string{followingIDs[2]})
 	assert.NoError(t, err)
 	assert.Len(t, following, 1)
 	assert.Equal(t, followingIDs[2], following[0].Value())

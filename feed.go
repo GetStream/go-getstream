@@ -259,9 +259,13 @@ func (f *baseFeed) GetFollowers(limit int, offset int) ([]FeedID, error) {
 	return outputFeeds, err
 }
 
-// FollowingWithLimitAndSkip returns a list of FeedID followed by the current FlatFeed
-// TODO: need to support filters
+// GetFollowings returns a list of FeedID followed by the current FlatFeed
 func (f *baseFeed) GetFollowings(limit int, offset int) ([]FeedID, error) {
+	return f.GetFollowingsFiltered(limit, offset, nil)
+}
+
+// GetFollowingsFiltered returns a list of FeedID followed by the current FlatFeed, filtered with the provided feed IDs.
+func (f *baseFeed) GetFollowingsFiltered(limit int, offset int, filter []string) ([]FeedID, error) {
 	var (
 		err         error
 		outputFeeds []FeedID
@@ -272,6 +276,9 @@ func (f *baseFeed) GetFollowings(limit int, offset int) ([]FeedID, error) {
 	params := map[string]string{
 		"limit":  strconv.Itoa(limit),
 		"offset": strconv.Itoa(offset),
+	}
+	if filter != nil {
+		params["filter"] = strings.Join(filter, ",")
 	}
 
 	resultBytes, err := f.Client.get(f, endpoint, nil, params)

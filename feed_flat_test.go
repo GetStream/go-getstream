@@ -228,6 +228,34 @@ func TestFlatFeedFollow(t *testing.T) {
 	}
 }
 
+func TestFlatFeedFollowingsFilter(t *testing.T) {
+	client := PreTestSetup(t)
+
+	feedA := getFlatFeed(t, client)
+
+	followingIDs := make([]string, 10)
+	for i := range followingIDs {
+		f := getFlatFeed(t, client)
+		err := feedA.Follow(f)
+		require.NoError(t, err)
+		followingIDs[i] = f.FeedID().Value()
+	}
+
+	following, err := feedA.GetFollowingsFiltered(5, 0, []string{followingIDs[2]})
+	assert.NoError(t, err)
+	assert.Len(t, following, 1)
+	assert.Equal(t, followingIDs[2], following[0].Value())
+
+	following, err = feedA.GetFollowingsFiltered(5, 0, []string{followingIDs[2], followingIDs[4]})
+	assert.NoError(t, err)
+	assert.Len(t, following, 2)
+	assert.Equal(t, followingIDs[4], following[0].Value())
+	assert.Equal(t, followingIDs[2], following[1].Value())
+
+	_, err = feedA.GetFollowingsFiltered(5, 0, []string{followingIDs[2], followingIDs[4], "boom"})
+	assert.Error(t, err)
+}
+
 func TestFlatFeedFollowingFollowers(t *testing.T) {
 	client := PreTestSetup(t)
 

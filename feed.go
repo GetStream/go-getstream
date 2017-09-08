@@ -38,6 +38,7 @@ type Feed interface {
 
 	GetFollowers(limit int, offset int) ([]FeedID, error)
 	GetFollowings(limit int, offset int) ([]FeedID, error)
+	GetFollowingsFiltered(limit int, offset int, filter []string) ([]FeedID, error)
 }
 
 // A collection of common code between all feeds

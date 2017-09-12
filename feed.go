@@ -31,7 +31,7 @@ type Feed interface {
 	RemoveActivity(activityId string) error
 	RemoveActivityByForeignID(foreignId string) error
 
-	UpdateActivityToTargets(activity *Activity, news, adds, removes []string) error
+	UpdateActivityToTargets(activity *Activity, news, adds, removes []FeedID) error
 
 	Follow(target Feed) error
 	FollowFeedWithCopyLimit(target Feed, copyLimit int) error
@@ -338,7 +338,7 @@ func (f *baseFeed) FollowFeedWithCopyLimit(target Feed, copyLimit int) error {
 
 // UpdateActivityToTargets updates the to targets for the provided Activity using
 // the string slices arguments.
-func (f *baseFeed) UpdateActivityToTargets(activity *Activity, news, adds, removes []string) error {
+func (f *baseFeed) UpdateActivityToTargets(activity *Activity, news, adds, removes []FeedID) error {
 	if activity == nil {
 		return fmt.Errorf("activity cannot be nil")
 	}
@@ -348,9 +348,9 @@ func (f *baseFeed) UpdateActivityToTargets(activity *Activity, news, adds, remov
 	data := struct {
 		ForeignID string   `json:"foreign_id,omitempty"`
 		Time      string   `json:"time,omitempty"`
-		New       []string `json:"new_targets,omitempty"`
-		Adds      []string `json:"added_targets,omitempty"`
-		Removes   []string `json:"removed_targets,omitempty"`
+		New       []FeedID `json:"new_targets,omitempty"`
+		Adds      []FeedID `json:"added_targets,omitempty"`
+		Removes   []FeedID `json:"removed_targets,omitempty"`
 	}{
 		ForeignID: activity.ForeignID,
 		Time:      activity.TimeStamp.Format(timeLayout),

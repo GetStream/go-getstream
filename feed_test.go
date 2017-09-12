@@ -30,7 +30,7 @@ func TestUpdateActivityToTargets(t *testing.T) {
 	testCases := []struct {
 		activity            *getstream.Activity
 		shouldError         bool
-		news, adds, removes []string
+		news, adds, removes []getstream.FeedID
 	}{
 		{
 			shouldError: true,
@@ -41,7 +41,7 @@ func TestUpdateActivityToTargets(t *testing.T) {
 		},
 		{
 			activity:    activity,
-			news:        []string{f3.FeedID().Value()},
+			news:        []getstream.FeedID{f3.FeedID()},
 			shouldError: false,
 		},
 	}

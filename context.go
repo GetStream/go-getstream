@@ -44,4 +44,9 @@ var contextMatchers = []ContextMatcher{
 		context: ScopeContextFeed,
 		auth:    FeedAuthentication,
 	},
+	{
+		re:      regexp.MustCompile("^feed_targets/"),
+		context: ScopeContextFeedTargets,
+		auth:    FeedAuthentication,
+	},
 }

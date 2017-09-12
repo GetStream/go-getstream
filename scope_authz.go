@@ -41,8 +41,10 @@ const (
 	ScopeContextFeed ScopeContext = 2
 	// ScopeContextFollower : Following + Followers Endpoint
 	ScopeContextFollower ScopeContext = 4
+	// ScopeContextFeedTargets : UpdateFeedToTargets
+	ScopeContextFeedTargets ScopeContext = 8
 	// ScopeContextAll : Allow access to any resource
-	ScopeContextAll ScopeContext = 8
+	ScopeContextAll ScopeContext = 16
 )
 
 // Value returns a string representation
@@ -54,6 +56,8 @@ func (a ScopeContext) Value() string {
 		return "feed"
 	case ScopeContextFollower:
 		return "follower"
+	case ScopeContextFeedTargets:
+		return "feed_targets"
 	case ScopeContextAll:
 		return "*"
 	default:

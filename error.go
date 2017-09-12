@@ -31,19 +31,44 @@ func (e *Error) Error() string {
 func (e *Error) UnmarshalJSON(b []byte) error {
 	type alias Error
 	aux := &struct {
-		Duration string `json:"duration"`
+		Duration        string                 `json:"duration"`
+		ExceptionFields map[string]interface{} `json:"exception_fields"`
 		*alias
-	}{
-		alias: (*alias)(e),
-	}
-	err := json.Unmarshal(b, &aux)
-	if err != nil {
+	}{alias: (*alias)(e)}
+
+	if err := json.Unmarshal(b, &aux); err != nil {
 		return err
 	}
+
 	dur, err := time.ParseDuration(aux.Duration)
 	if err != nil {
 		return err
 	}
 	e.Duration = dur
+	e.ExceptionFields = makeExceptionFields(aux.ExceptionFields)
 	return nil
+}
+
+func makeExceptionFields(data map[string]interface{}) map[string][]string {
+	if len(data) == 0 {
+		return nil
+	}
+
+	exceptionFields := make(map[string][]string)
+	for k, v := range data {
+		slice, ok := v.([]interface{})
+		if !ok {
+			continue
+		}
+		exceptionFields[k] = make([]string, len(slice))
+		i := 0
+		for _, elem := range slice {
+			if s, ok := elem.(string); ok {
+				exceptionFields[k][i] = s
+				i++
+			}
+		}
+		exceptionFields[k] = exceptionFields[k][:i]
+	}
+	return exceptionFields
 }

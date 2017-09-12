@@ -8,6 +8,7 @@ import (
 
 	getstream "github.com/GetStream/stream-go"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestError(t *testing.T) {
@@ -49,4 +50,14 @@ func TestErrorBadDuration(t *testing.T) {
 		err := json.Unmarshal([]byte(payload), &e)
 		assert.NotNil(t, err)
 	}
+}
+
+func TestExceptionFields(t *testing.T) {
+	var e getstream.Error
+	err := json.Unmarshal([]byte(`{"duration": "1ms", "exception_fields": {"test":["good", "one"], "bad": "nothing", "worse": {"even":"flow"}}}`), &e)
+	require.NoError(t, err)
+	expected := map[string][]string{
+		"test": []string{"good", "one"},
+	}
+	require.Equal(t, expected, e.ExceptionFields)
 }

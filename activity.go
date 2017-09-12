@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const timeLayout = "2006-01-02T15:04:05.999999"
+
 // Activity is a getstream Activity
 // Use it to post activities to Feeds
 // It is also the response from Fetch and List Requests
@@ -62,7 +64,7 @@ func (a Activity) MarshalJSON() ([]byte, error) {
 	}
 
 	if a.TimeStamp != nil {
-		payload["time"] = a.TimeStamp.Format("2006-01-02T15:04:05.999999")
+		payload["time"] = a.TimeStamp.Format(timeLayout)
 	}
 
 	if len(a.signedTo) > 0 {
@@ -133,7 +135,7 @@ func (a *Activity) UnmarshalJSON(b []byte) (err error) { // TODO clean up marsha
 			if err != nil {
 				continue
 			}
-			timeStamp, err := time.Parse("2006-01-02T15:04:05.999999", strValue)
+			timeStamp, err := time.Parse(timeLayout, strValue)
 			if err != nil {
 				continue
 			}

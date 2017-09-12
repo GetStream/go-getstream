@@ -1,86 +1,57 @@
-package getstream
+package getstream_test
 
 import (
 	"testing"
+	"time"
+
+	getstream "github.com/GetStream/stream-go"
+	"github.com/stretchr/testify/require"
 )
 
-func TestFlatFeedBasic(t *testing.T) {
-	client, err := New(&Config{
-		APIKey:    "a key",
-		APISecret: "a secret",
-		AppID:     "11111",
-		Location:  "us-east"})
-	if err != nil {
-		t.Fatal(err)
-	}
+func TestUpdateActivityToTargets(t *testing.T) {
+	client := PreTestSetup(t)
+	f1 := getFlatFeed(t, client)
+	f2 := getFlatFeed(t, client)
+	f3 := getFlatFeed(t, client)
 
-	flatFeed := FlatFeed{
-		baseFeed{
-			Client:   client,
-			FeedSlug: "feedGroup",
-			UserID:   "feedName",
+	now := time.Now()
+
+	activity := &getstream.Activity{
+		Actor:     "bob",
+		Verb:      "like",
+		Object:    "cakes",
+		ForeignID: "bob:123",
+		TimeStamp: &now,
+		To:        []getstream.FeedID{f2.FeedID()},
+	}
+	_, err := f1.AddActivity(activity)
+	require.NoError(t, err)
+
+	testCases := []struct {
+		activity            *getstream.Activity
+		shouldError         bool
+		news, adds, removes []string
+	}{
+		{
+			shouldError: true,
+		},
+		{
+			activity:    &getstream.Activity{},
+			shouldError: true,
+		},
+		{
+			activity:    activity,
+			news:        []string{f3.FeedID().Value()},
+			shouldError: false,
 		},
 	}
 
-	if "feedGroupfeedName" != flatFeed.Signature() {
-		t.Fatal()
-	}
-
-	if "feedGroup:feedName" != string(flatFeed.FeedID()) {
-		t.Fatal()
-	}
-
-	flatFeed.SignFeed(flatFeed.Client.Signer)
-	if "NWH8lcFHfHYEc2xdMs2kOhM-oII" != flatFeed.Token() {
-		t.Fatal()
-	}
-
-	if "NWH8lcFHfHYEc2xdMs2kOhM-oII" != flatFeed.GenerateToken(flatFeed.Client.Signer) {
-		t.Fatal()
-	}
-
-	if "feedGroupfeedName NWH8lcFHfHYEc2xdMs2kOhM-oII" != flatFeed.Signature() {
-		t.Fatal()
-	}
-}
-
-func TestNotificationFeedBasic(t *testing.T) {
-	client, err := New(&Config{
-		APIKey:    "a key",
-		APISecret: "a secret",
-		AppID:     "11111",
-		Location:  "us-east"})
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	notificationFeed := NotificationFeed{
-		baseFeed{
-			Client:   client,
-			FeedSlug: "feedGroup",
-			UserID:   "feedName",
-		},
-	}
-
-	if "feedGroupfeedName" != notificationFeed.Signature() {
-		t.Fatal()
-	}
-
-	if "feedGroup:feedName" != string(notificationFeed.FeedID()) {
-		t.Fatal()
-	}
-
-	notificationFeed.SignFeed(notificationFeed.Client.Signer)
-
-	if "NWH8lcFHfHYEc2xdMs2kOhM-oII" != notificationFeed.Token() {
-		t.Fatal()
-	}
-
-	if "NWH8lcFHfHYEc2xdMs2kOhM-oII" != notificationFeed.GenerateToken(notificationFeed.Client.Signer) {
-		t.Fatal()
-	}
-
-	if "feedGroupfeedName NWH8lcFHfHYEc2xdMs2kOhM-oII" != notificationFeed.Signature() {
-		t.Fatal()
+	for _, tc := range testCases {
+		err := f1.UpdateActivityToTargets(tc.activity, tc.news, tc.adds, tc.removes)
+		if tc.shouldError {
+			require.Error(t, err)
+		} else {
+			require.NoError(t, err)
+		}
 	}
 }

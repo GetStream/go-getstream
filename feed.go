@@ -31,6 +31,8 @@ type Feed interface {
 	RemoveActivity(activityId string) error
 	RemoveActivityByForeignID(foreignId string) error
 
+	UpdateActivityToTargets(activity *Activity, news, adds, removes []string) error
+
 	Follow(target Feed) error
 	FollowFeedWithCopyLimit(target Feed, copyLimit int) error
 	Unfollow(target Feed) error
@@ -332,4 +334,36 @@ func (f *baseFeed) Follow(target Feed) error {
 // CopyLimit is the maximum number of Activities to Copy from History
 func (f *baseFeed) FollowFeedWithCopyLimit(target Feed, copyLimit int) error {
 	return f.follow(target, &copyLimit)
+}
+
+// UpdateActivityToTargets updates the to targets for the provided Activity using
+// the string slices arguments.
+func (f *baseFeed) UpdateActivityToTargets(activity *Activity, news, adds, removes []string) error {
+	if activity == nil {
+		return fmt.Errorf("activity cannot be nil")
+	}
+	if activity.TimeStamp == nil {
+		return fmt.Errorf("activity timestamp cannot be nil")
+	}
+	data := struct {
+		ForeignID string   `json:"foreign_id,omitempty"`
+		Time      string   `json:"time,omitempty"`
+		New       []string `json:"new_targets,omitempty"`
+		Adds      []string `json:"added_targets,omitempty"`
+		Removes   []string `json:"removed_targets,omitempty"`
+	}{
+		ForeignID: activity.ForeignID,
+		Time:      activity.TimeStamp.Format(timeLayout),
+		New:       news,
+		Adds:      adds,
+		Removes:   removes,
+	}
+	payload, err := json.Marshal(data)
+	if err != nil {
+		return fmt.Errorf("cannot marshal data: %s", err)
+	}
+
+	endpoint := "feed_targets/" + f.FeedSlug + "/" + f.UserID + "/" + "activity_to_targets" + "/"
+	_, err = f.Client.post(f, endpoint, payload, nil)
+	return err
 }

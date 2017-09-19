@@ -459,16 +459,16 @@ func Test_ClientLocation(t *testing.T) {
 		},
 		{
 			location: "example",
-			expected: "https://api-example.getstream.io/api/v1.0/",
+			expected: "https://example-api.getstream.io/api/v1.0/",
 		},
 		{
 			location: "example",
 			version:  "v42",
-			expected: "https://api-example.getstream.io/api/v42/",
+			expected: "https://example-api.getstream.io/api/v42/",
 		},
 		{
 			location: "example",
-			expected: "https://api-example.getstream.io/api/v1.0/",
+			expected: "https://example-api.getstream.io/api/v1.0/",
 		},
 		{
 			location: "http://example.com",

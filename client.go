@@ -106,7 +106,7 @@ func urlFromLocation(loc string) string {
 		location = "api"
 	)
 	if loc != "" {
-		location = fmt.Sprintf("api-%s", loc)
+		location = fmt.Sprintf("%s-api", loc)
 		if loc == "qa" {
 			protocol = "http"
 		}

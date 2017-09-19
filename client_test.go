@@ -442,3 +442,55 @@ func TestFollowManyCopyLimit(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, out.Activities, 0)
 }
+
+func Test_ClientLocation(t *testing.T) {
+	testCases := []struct {
+		location string
+		expected string
+		version  string
+	}{
+		{
+			location: "",
+			expected: "https://api.getstream.io/api/v1.0/",
+		},
+		{
+			location: "localhost",
+			expected: "http://localhost:8000/api/v1.0/",
+		},
+		{
+			location: "example",
+			expected: "https://api-example.getstream.io/api/v1.0/",
+		},
+		{
+			location: "example",
+			version:  "v42",
+			expected: "https://api-example.getstream.io/api/v42/",
+		},
+		{
+			location: "example",
+			expected: "https://api-example.getstream.io/api/v1.0/",
+		},
+		{
+			location: "http://example.com",
+			expected: "http://example.com/api/v1.0/",
+		},
+		{
+			location: "https://example.com:1234/",
+			expected: "https://example.com:1234/api/v1.0/",
+		},
+	}
+
+	for _, tc := range testCases {
+		cfg := &getstream.Config{
+			APIKey:    "key",
+			APISecret: "secret",
+			Location:  tc.location,
+		}
+		if tc.version != "" {
+			cfg.Version = tc.version
+		}
+		client, err := getstream.New(cfg)
+		require.NoError(t, err)
+		assert.Equal(t, tc.expected, client.BaseURL.String())
+	}
+}

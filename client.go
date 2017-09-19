@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"regexp"
 	"time"
 )
 
@@ -48,28 +49,19 @@ func New(cfg *Config) (*Client, error) {
 	}
 	cfg.SetTimeout(timeout)
 
-	if cfg.Version == "" {
+	if cfg.Version == "" { // TODO validate being ~= /^v[0-9\.]$/
 		cfg.Version = "v1.0"
 	}
 
-	location := "api"
-	port := ""
-	secure := "s"
-	mainDomain := ".getstream.io"
-
-	if cfg.Location == "localhost" {
-		location = "localhost"
-		port = ":8000"
-		secure = ""
-		mainDomain = ""
-	} else if cfg.Location != "" {
-		location = cfg.Location + "-api"
-		if cfg.Location == "qa" {
-			secure = ""
-		}
+	var urlString string
+	if regexp.MustCompile("^https?://").MatchString(cfg.Location) {
+		urlString = cfg.Location
+		cfg.Location = ""
+	} else {
+		urlString = urlFromLocation(cfg.Location)
 	}
-
-	baseURL, err := url.Parse("http" + secure + "://" + location + mainDomain + port + "/api/" + cfg.Version + "/")
+	urlString = regexp.MustCompile("/+$").ReplaceAllString(urlString, "")
+	baseURL, err := url.Parse(fmt.Sprintf("%s/api/%s/", urlString, cfg.Version))
 	if err != nil {
 		return nil, err
 	}
@@ -102,6 +94,24 @@ func New(cfg *Config) (*Client, error) {
 	}
 
 	return client, nil
+}
+
+func urlFromLocation(loc string) string {
+	if loc == "localhost" {
+		return fmt.Sprintf("http://localhost:8000")
+	}
+	var (
+		protocol = "https"
+		domain   = ".getstream.io"
+		location = "api"
+	)
+	if loc != "" {
+		location = fmt.Sprintf("api-%s", loc)
+		if loc == "qa" {
+			protocol = "http"
+		}
+	}
+	return protocol + "://" + location + domain
 }
 
 // FlatFeed returns a getstream feed

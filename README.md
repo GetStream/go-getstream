@@ -20,7 +20,17 @@ with them to get a final license in place. Stream will be modifying the codebase
 together with MrHenry over time, so we especially want to point out how great they
 have been working with us to release this library.
 
-### Full documentation
+### Go Language Support
+
+We will test against and support the following versions of Go:
+
+- 1.5.4
+- 1.6.4
+- 1.7.6
+- 1.8.3
+- 1.9
+
+### Full Documentation
 
 Documentation for this Go client are available at the [Stream website](https://getstream.io/docs/?language=go).
 

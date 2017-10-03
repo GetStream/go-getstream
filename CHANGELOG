@@ -2,6 +2,11 @@
  Change history
 ================
 
+1.0.3
+=====
+
+* Stopped checking foreign id to be a uuid, to remove activities. Any foreign ID is fine.
+
 1.0.1
 =====
 

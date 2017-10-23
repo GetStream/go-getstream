@@ -1,4 +1,12 @@
-# stream-go
+# stream-go (not supported anymore, see [stream-go2](https://github.com/GetStream/stream-go2))
+
+## Discontinued ⚠️
+
+The stream-go client is not officially supported anymore.
+
+Instead, we developed a new Go client called **stream-go2**, which can be found [here](https://github.com/GetStream/stream-go2).
+
+---
 
 [stream-go](https://github.com/GetStream/stream-go) is a (beta) Go client for [Stream](https://getstream.io/).
 
